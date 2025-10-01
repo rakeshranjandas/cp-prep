@@ -58,7 +58,7 @@
       Add Task
     </a>
   </div>
-  <div class="flex flex-row gap-8">
+  <div class="grid grid-cols-[1fr_auto] gap-8 items-start">
     <!-- All Tasks Table (left) -->
     <div class="flex-1 overflow-x-auto rounded-lg border bg-card">
     <h2 class="text-lg font-semibold px-4 py-2">All Tasks</h2>
@@ -110,34 +110,22 @@
     </table>
   </div>
 
-  <!-- Due Tasks Table (right) -->
-  <div class="w-[200px] min-w-[140px] max-w-[240px] overflow-x-auto rounded-lg border bg-card">
-  <h2 class="text-base font-semibold px-2 py-1">Due Tasks</h2>
-  <table class="w-full text-left text-xs">
-      <thead class="bg-muted/50 text-muted-foreground opacity-70 text-xs">
-        <tr>
-          <th class="px-2 py-2 font-medium">Title</th>
-          <th class="px-2 py-2 font-medium text-center">Next Review</th>
-        </tr>
-      </thead>
-      <tbody>
+    <!-- Due Tasks List (right) -->
+    <div class="w-[200px] min-w-[140px] max-w-[240px] rounded-lg border bg-card px-2 py-2">
+      <h2 class="text-base font-semibold mb-2">Due Tasks</h2>
+      <ul class="space-y-2">
         {#each dueTasks as t}
-          <tr class="border-t">
-            <td class="px-2 py-2">
-              <a href="/tasks/{t.id}" class="font-medium text-foreground hover:underline">{t.title}</a>
-            </td>
-            <td class={`px-2 py-2 text-center ${reviewDateColor(t.nextReview)}`}>{t.nextReview}</td>
-          </tr>
+          <li class="border-b last:border-b-0 pb-2 text-sm">
+            <a href="/tasks/{t.id}" class="font-medium text-foreground hover:underline block">
+              {t.title}
+            </a>
+            <span class={`block text-xs mt-0.5 ${reviewDateColor(t.nextReview)}`}>{t.nextReview}</span>
+          </li>
         {/each}
         {#if dueTasks.length === 0}
-          <tr>
-            <td class="px-2 py-4 text-center text-muted-foreground" colspan="2">
-              No due tasks.
-            </td>
-          </tr>
+          <li class="text-center text-muted-foreground py-4">No due tasks.</li>
         {/if}
-      </tbody>
-    </table>
-  </div>
+      </ul>
+    </div>
   </div>
 </section>
