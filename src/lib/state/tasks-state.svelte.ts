@@ -68,11 +68,15 @@ export class TaskState {
     getDueTasks(): Task[] {
         const now = new Date();
         return [...this.tasks]
-            .filter((t) => !!t.nextReview)
+            .filter(
+            (t) =>
+                t.nextReview &&
+                new Date(t.nextReview).getTime() - now.getTime() <= 7 * 24 * 60 * 60 * 1000 // Within 7 days
+            )
             .sort(
-                (a, b) =>
-                    new Date(a.nextReview!).getTime() -
-                    new Date(b.nextReview!).getTime()
+            (a, b) =>
+                new Date(a.nextReview!).getTime() -
+                new Date(b.nextReview!).getTime()
             );
     }
 
