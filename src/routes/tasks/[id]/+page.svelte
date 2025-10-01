@@ -2,8 +2,6 @@
   import { preventDefault } from 'svelte/legacy';
 
   import { page } from '$app/stores';
-  import type { Task } from '$lib/data/sample';
-  import { tasks } from '$lib/data/sample';
   import { derived } from 'svelte/store';
   
   import { writable } from 'svelte/store';

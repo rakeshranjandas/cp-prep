@@ -1,13 +1,15 @@
 import { getContext, setContext } from "svelte";
 
-export type Platform = "Codeforces" | "LeetCode" | "AtCoder" | "CodeChef";
-
 export interface Task {
     id: number;
     title: string;
-    platform: Platform;
+    platform: string;
     tags: string[];
     status: "Todo" | "In Progress" | "Solved" | "Review";
+    lastReviewed?: string; // Date yyyy-mm-dd e.g. "2025-10-03"
+    nextReview?: string;   // Date yyyy-mm-dd e.g. "2025-10-03"
+    notes?: string;
+    url?: string;
 };
 
 const dummyTasks: Task[] = [
@@ -17,6 +19,8 @@ const dummyTasks: Task[] = [
         platform: "LeetCode",
         status: "Solved",
         tags: ["Array", "Hash Table"],
+        lastReviewed: "2025-09-20",
+        nextReview: "2025-10-22",
     },
     {
         id: 2,
@@ -24,6 +28,8 @@ const dummyTasks: Task[] = [
         platform: "LeetCode",
         status: "In Progress",
         tags: ["Tree", "DFS"],
+        lastReviewed: "2025-09-25",
+        nextReview: "2025-10-01",
     },
     {
         id: 3,
@@ -31,6 +37,8 @@ const dummyTasks: Task[] = [
         platform: "LeetCode",
         status: "Todo",
         tags: ["Linked List", "Heap"],
+        lastReviewed: "2025-09-15",
+        nextReview: "2025-10-05",
     },
     {
         id: 4,
@@ -38,6 +46,7 @@ const dummyTasks: Task[] = [
         platform: "LeetCode",
         status: "Solved",
         tags: ["Stack", "String"],
+        lastReviewed: "2025-09-18",
     },
     {
         id: 5,
@@ -45,6 +54,7 @@ const dummyTasks: Task[] = [
         platform: "LeetCode",
         status: "In Progress",
         tags: ["Array", "Dynamic Programming"],
+        lastReviewed: "2025-09-22",
     },
 ];
 
@@ -56,13 +66,24 @@ export class TaskState {
     }
 
     getDueTasks(): Task[] {
-        return this.tasks.filter((t) => t.id%2 == 0);
+        const now = new Date();
+        return [...this.tasks]
+            .filter((t) => !!t.nextReview)
+            .sort(
+                (a, b) =>
+                    new Date(a.nextReview!).getTime() -
+                    new Date(b.nextReview!).getTime()
+            );
     }
 
     getAllTasks(): Task[] {
-        return this.tasks;
+        return [...this.tasks].sort((a, b) => b.id - a.id);
     }
 
+    addTask(newTask: Task): void {
+        newTask['id'] = this.tasks.length + 1;
+        this.tasks = [...this.tasks, newTask]
+    }
 }
 
 const TASK_STATE_KEY = Symbol("TASK_STATE");
