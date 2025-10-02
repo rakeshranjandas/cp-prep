@@ -50,15 +50,15 @@
 </script>
 
 <section class="flex flex-col gap-4">
-  <div class="flex items-center justify-end">
+  <div class="flex items-center">
     <a
       href="/tasks/new"
-      class="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+      class="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90 border opacity-50"
     >
       Add Task
     </a>
   </div>
-  <div class="grid grid-cols-[1fr_auto] gap-8 items-start">
+  <div class="grid grid-cols-[1fr_auto] gap-15 items-start">
     <!-- All Tasks Table (left) -->
     <div class="flex-1 overflow-x-auto rounded-lg border bg-card">
     <h2 class="text-lg font-semibold px-4 py-2">All Tasks</h2>
@@ -111,15 +111,15 @@
   </div>
 
     <!-- Due Tasks List (right) -->
-    <div class="w-[200px] min-w-[140px] max-w-[240px] rounded-lg border bg-card px-2 py-2">
-      <h2 class="text-base font-semibold mb-2">Due Tasks</h2>
+    <div class="w-[170px] min-w-[140px] max-w-[240px] rounded-lg border bg-card px-2 py-2 text-right">
+      <h2 class="text-base font-semibold mb-2 opacity-50">Due Tasks</h2>
       <ul class="space-y-2">
         {#each dueTasks as t}
           <li class="border-b last:border-b-0 pb-2 text-sm">
-            <a href="/tasks/{t.id}" class="font-medium text-foreground hover:underline block">
+            <a href="/tasks/{t.id}" class={`text-foreground hover:underline block ${reviewDateColor(t.nextReview)}`}>
               {t.title}
             </a>
-            <span class={`block text-xs mt-0.5 ${reviewDateColor(t.nextReview)}`}>{t.nextReview}</span>
+            <!-- <span class={`block text-xs mt-0.5 ${reviewDateColor(t.nextReview)}`}>{t.nextReview}</span> -->
           </li>
         {/each}
         {#if dueTasks.length === 0}
