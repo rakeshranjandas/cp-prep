@@ -1,0 +1,62 @@
+<?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once('db.php');
+$db = DB::init();
+$db->beginTransaction();
+
+
+try {
+    $result = [];
+
+    switch ($_REQUEST['action']) {
+
+        case 'get_all_tasks':
+            $page = $_REQUEST['page'];
+            $result = $db->getAllTasks($page);
+            break;
+
+        case 'add_task':
+            $taskInput = $_REQUEST['task'];
+            $result = $db->addTask($taskInput);
+            break;
+
+        case 'get_due_tasks':
+            $result = $db->getDueTasks();
+            break;
+
+        case 'update_task_status_to_in_progress':
+            $taskOccurenceId = $_REQUEST['task_occurences_id'];
+            $db->updateTaskOccurenceStatusToInProgress($taskOccurenceId);
+            break;
+
+        case 'update_task_status_to_completed':
+            $taskOccurenceId = $_REQUEST['task_occurences_id'];
+            $result = $db->updateTaskOccurenceStatusToCompleted($taskOccurenceId);
+            break;
+
+
+        case 'update_task_status_to_pending':
+            $taskOccurenceId = $_REQUEST['task_occurences_id'];
+            $db->updateTaskOccurenceStatusToPending($taskOccurenceId);
+            break;
+
+        case 'add_task_review':
+            $taskId = $_REQUEST['task_id'];
+            $reviewDate = $_REQUEST['review_date'];
+            $repeatPolicy = $_REQUEST['repeat_policy'];
+
+            $db->addTaskReview($taskId, $reviewDate, $repeatPolicy);
+    }
+
+    $db->commit();
+    echo json_encode($result);
+
+} catch (Exception $e) {
+    $db->rollback();
+    http_response_code(500);
+    echo $e->getMessage();
+}
