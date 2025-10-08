@@ -31,11 +31,25 @@
 			padding: 28px;
 		}
 		.dashboard {
-			max-width: 1400px;
+			/* max-width: 1400px; */
 			margin: 0 auto;
 			display: grid;
-			grid-template-columns: 1fr 350px;
+			grid-template-columns: 0.6fr 2fr 0.6fr; /* Left, Center, Right layout */
 			gap: 20px;
+			align-items: start;
+		}
+		main {
+			grid-column: 2; /* Center column */
+		}
+		.due-tasks {
+			grid-column: 1; /* Left column */
+			position: sticky;
+			top: 0;
+		}
+		.sessions {
+			grid-column: 3; /* Right column */
+			position: sticky;
+			top: 0;
 		}
 		.header {
 			display: flex;
@@ -276,14 +290,65 @@
 			color: red;
 		}
 
+		.card .sectionHeaderDiv {
+			height: 3rem;
+			display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
+		}
+
 	</style>
 
 </head>
 <body>
 	<div class="dashboard">
+		<div class="due-tasks">
+			<div class="card">
+				<div class="sectionHeaderDiv">
+					<div class="section-header">Due Tasks</div>
+				</div>
+				<ul class="due-list" style="padding:0;margin:0;list-style:none">
+					<li class="due-list-item">
+						<div style="font-weight:bold">Binary Search Practice</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-05</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Dynamic Programming Session</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-06</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+					<li class="due-list-item">
+						<div style="font-weight:bold">Graph Theory Review</div>
+						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
 		<main>
 			<div class="card">
-				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+				<div class="sectionHeaderDiv">
 					<div class="section-header">All Tasks</div>
 					<div style="display:flex;gap:12px;align-items:center">
 					<button class="button" onclick="TaskModal.showAdd()">New Task</button>
@@ -342,47 +407,9 @@
 			</div>
 		</main>
 
-		<aside>
+		<div class="sessions">
 			<div class="card">
-				<div class="section-header">Due Tasks</div>
-				<ul class="due-list" style="padding:0;margin:0;list-style:none">
-					<li class="due-list-item">
-						<div style="font-weight:bold">Binary Search Practice</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-05</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Dynamic Programming Session</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-06</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-				</ul>
-			</div>
-
-			<div class="card" style="margin-top:12px">
-				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+				<div class="sectionHeaderDiv">
 					<div class="section-header">Sessions</div>
 					<button class="button" id="addSessionBtn">New Session</button>
 				</div>
@@ -431,7 +458,7 @@
                     <button class="button next-button" id="sessionsNext">></button>
                 </div>
 			</div>
-		</aside>
+		</div>
 	</div>
 
 	<!-- Modal for Task Preview and Edit -->
