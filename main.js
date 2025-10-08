@@ -1,5 +1,3 @@
-
-
 let App = {
 
     renderAll: function(onComplete) {
@@ -299,6 +297,42 @@ let TaskModal = {
         return taskData;
     }
 
+};
+
+const SessionModal = {
+    showAdd: function() {
+        $('#sessionModalTitle').text('New Session');
+        $('#sessionPreview').hide();
+        $('#sessionForm').show();
+        $('#sessionModal').fadeIn();
+    },
+    showPreview: function(sessionId) {
+        // Fetch session details using sessionId (mocked for now)
+        const session = {
+            name: 'Morning Practice',
+            description: 'Practice session for algorithms.',
+            dueDate: '2025-10-10',
+            status: 'In Progress'
+        };
+
+        $('#previewSessionName').text(session.name);
+        $('#previewSessionDescription').text(session.description);
+        $('#previewSessionDueDate').text(session.dueDate);
+        $('#previewSessionStatus').text(session.status);
+
+        $('#sessionModalTitle').text('Session Preview');
+        $('#sessionPreview').show();
+        $('#sessionForm').hide();
+        $('#sessionModal').fadeIn();
+    },
+    showEdit: function() {
+        $('#sessionModalTitle').text('Edit Session');
+        $('#sessionPreview').hide();
+        $('#sessionForm').show();
+    },
+    close: function() {
+        $('#sessionModal').fadeOut();
+    }
 };
 
 let Service = {

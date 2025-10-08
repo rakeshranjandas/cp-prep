@@ -411,7 +411,7 @@
 			<div class="card">
 				<div class="sectionHeaderDiv">
 					<div class="section-header">Sessions</div>
-					<button class="button" id="addSessionBtn">New Session</button>
+					<button class="button" id="addSessionBtn" onclick="SessionModal.showAdd()">New Session</button>
 				</div>
 
 				<div style="display:flex;align-items:center;gap:8px;justify-content:right">
@@ -539,6 +539,43 @@
 			</form>
 		</div>
 	</div>
+
+	<!-- Modal for Session Preview and Edit -->
+	<div id="sessionModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2 class="section-header" id="sessionModalTitle"></h2>
+        <div id="sessionPreview" style="display:block;" data-sessionid="">
+            <p><strong>Name:</strong> <span id="previewSessionName"></span></p>
+            <p><strong>Description:</strong> <span id="previewSessionDescription"></span></p>
+            <p><strong>Due Date:</strong> <span id="previewSessionDueDate"></span></p>
+            <p><strong>Status:</strong> <span id="previewSessionStatus"></span></p>
+            <div style="display:flex;justify-content:space-between;">
+                <button id="editSessionButton" class="button" onclick="SessionModal.showEdit()">Edit</button>
+                <button type="button" id="closeSessionModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="SessionModal.close()">Cancel</button>
+            </div>
+        </div>
+        <form id="sessionForm" style="display:none;">
+            <input type="hidden" id="sessionIdHidden" name="sessionId" value="0">
+            <div class="formField">
+                <label for="sessionName">Name</label>
+                <input type="text" id="sessionName" name="sessionName" class="textFieldInput">
+            </div>
+            <div class="formField">
+                <label for="sessionDescription">Description</label>
+                <textarea id="sessionDescription" name="sessionDescription" class="textFieldInput" rows="4"></textarea>
+            </div>
+            <div class="formField">
+                <label for="sessionDueDate">Due Date</label>
+                <input type="date" id="sessionDueDate" name="sessionDueDate" class="textFieldInput">
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+                <button type="submit" class="button" onclick="App.addEditSession()">Save</button>
+                <button type="button" id="closeSessionModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="SessionModal.close()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 	<script>
 		
 		// jQuery version: toggle completed sessions visibility
