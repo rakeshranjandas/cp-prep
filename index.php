@@ -295,6 +295,17 @@
 			display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
 		}
 
+		#taskTable {
+			display: block;
+		}
+
+		#taskTable tbody {
+			display: block;
+			max-height: 300px;
+			height: 300px;;
+			overflow-y: auto;
+		}
+
 	</style>
 
 </head>
@@ -568,6 +579,23 @@
                 <label for="sessionDueDate">Due Date</label>
                 <input type="date" id="sessionDueDate" name="sessionDueDate" class="textFieldInput">
             </div>
+            <div class="formField">
+                <label for="sessionTasks">Select Tasks</label>
+                <div class="formField" style="display: flex; gap: 10%; flex-direction: row;">
+                    <div style="width: 60%;">
+                        <input type="text" id="taskFilter" class="textFieldInput" placeholder="Search tasks..." oninput="SessionModal.searchTasks(this)">
+                        <table id="taskTable" class="table">
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="width: 30%;">
+                        <ul id="selectedTasksList" style="list-style: none; padding: 0; margin: 0; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto;">
+                            <!-- Selected tasks will appear here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div style="display:flex;justify-content:space-between;">
                 <button type="submit" class="button" onclick="App.addEditSession()">Save</button>
                 <button type="button" id="closeSessionModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="SessionModal.close()">Cancel</button>
@@ -614,6 +642,29 @@
 
 		$(function() {
 			App.renderAll();
+		});
+
+		$(document).ready(function() {
+			// $('#taskFilter').on('input', function() {
+			// 	const filter = $(this).val().toLowerCase();
+			// 	$('#taskTable tbody tr').each(function() {
+			// 		const taskName = $(this).find('td:nth-child(2)').text().toLowerCase();
+			// 		const platform = $(this).find('td:nth-child(3)').text().toLowerCase();
+			// 		$(this).toggle(taskName.includes(filter) || platform.includes(filter));
+			// 	});
+			// });
+
+			// $('#taskTable input[type="checkbox"]').on('change', function() {
+			// 	const $checkbox = $(this);
+			// 	const taskName = $checkbox.closest('tr').find('td:nth-child(2)').text();
+			// 	const taskId = $checkbox.val();
+
+			// 	if ($checkbox.is(':checked')) {
+			// 		$('#selectedTasksList').append(`<li data-task-id="${taskId}" ondblclick="alert('s');">${taskName}</li>`);
+			// 	} else {
+			// 		$(`#selectedTasksList li[data-task-id="${taskId}"]`).remove();
+			// 	}
+			// });
 		});
 	</script>
 </body>

@@ -300,12 +300,19 @@ let TaskModal = {
 };
 
 const SessionModal = {
+    _searchTaskTimeout: null,
+
+    _selectedTasks: [],
+
     showAdd: function() {
         $('#sessionModalTitle').text('New Session');
         $('#sessionPreview').hide();
         $('#sessionForm').show();
         $('#sessionModal').fadeIn();
+        this._selectedTasks = [];
+        this.searchTasks();
     },
+
     showPreview: function(sessionId) {
         // Fetch session details using sessionId (mocked for now)
         const session = {
@@ -325,19 +332,79 @@ const SessionModal = {
         $('#sessionForm').hide();
         $('#sessionModal').fadeIn();
     },
+
     showEdit: function() {
         $('#sessionModalTitle').text('Edit Session');
         $('#sessionPreview').hide();
         $('#sessionForm').show();
     },
+
     close: function() {
         $('#sessionModal').fadeOut();
-    }
+    },
+
+    searchTasks: function(tis) {
+        // Debounce logic
+        clearTimeout(this._searchTaskTimeout);
+        this._searchTaskTimeout = setTimeout(() => {
+            let prefix = tis ? $(tis).val(): "";
+            
+            Service.getTasksByPrefix(prefix, (tasks) => {
+
+                this._renderSelectedTasks();
+                let $tbody = $('#taskTable tbody');
+                $tbody.empty();
+
+                tasks.forEach((task) => {
+                    let checked = this._selectedTasks.find((selectedTask) => selectedTask.id == task.id) ? 'checked': '';
+                    $tbody.append(
+                        `<tr data-id="${task.id}">
+                            <td><input type="checkbox" name="sessionTasks[]" value="${task.id}" onchange="SessionModal.checkTask(this)" ${checked}></td>
+                            <td class="sessionTasksSelectTitle">${task.title}</td>
+                            <td>${task.tags.reduce((prev, cur) => prev + ('<span class="tag">'+cur+'</span>'), "")}</td>
+                        </tr>`
+                    );
+                });
+            });
+        }, 500);
+
+    },
+
+    checkTask: function(tis) {
+        let $tr = $(tis).closest('tr');
+        let taskId = $tr.attr('data-id');
+
+        if (tis.checked) {
+            this._selectedTasks.push({
+                id: taskId,
+                title: $tr.find('.sessionTasksSelectTitle').text()
+            });
+
+        } else {
+            this._selectedTasks = this._selectedTasks.filter(task => task.id != taskId);
+        }
+
+        this._renderSelectedTasks();
+    },
+
+    _renderSelectedTasks: function() {
+        let $selectedTasksUl = $('#selectedTasksList');
+        $selectedTasksUl.empty();
+
+        this._selectedTasks.forEach((task) => {
+            $selectedTasksUl.append(`<li data-id="${task.id}" ondblclick="alert('s');">${task.title}</li>`);
+        })
+    },
+
 };
 
 let Service = {
 
     _cachedTasks: {},
+
+    // Variables used to render the output of the last sent ajax call
+    _lastGetTasksByPrefixSent: 0, 
+    _lastGetTasksByPrefixProcessed: 0,
 
     _cacheTasks: function(tasks) {
         tasks.forEach((task) => {this._cachedTasks[task.id] = task});
@@ -371,6 +438,22 @@ let Service = {
 
     getTask: function(taskId) {
         return this._cachedTasks[taskId];
+    },
+
+    getTasksByPrefix: function(prefix, onSuccess) {
+        this._doAjax(
+            { action: "get_tasks_by_prefix", prefix: prefix, last_counter: ++this._lastGetTasksByPrefixSent },
+            function (res) {
+
+                if (res.last_counter < Service._lastGetTasksByPrefixProcessed) {
+                    return;
+                }
+
+                onSuccess(res.tasks);
+                Service._lastGetTasksByPrefixProcessed = parseInt(res.last_counter);
+            },
+            "GET"
+        );
     },
 
     getDueTasks: function(onSuccess) {

@@ -28,6 +28,15 @@ try {
             $result = $db->getDueTasks();
             break;
 
+        case 'get_tasks_by_prefix':
+            $prefix = $_REQUEST['prefix'];
+            $lastCounter = $_REQUEST['last_counter']; // Used by js to process the last output
+            $result = [
+                'last_counter' => $lastCounter,
+                'tasks' => $db->getTasksByPrefix($prefix)
+            ];
+            break;
+
         case 'update_task_status_to_in_progress':
             $taskOccurenceId = $_REQUEST['task_occurences_id'];
             $db->updateTaskOccurenceStatusToInProgress($taskOccurenceId);

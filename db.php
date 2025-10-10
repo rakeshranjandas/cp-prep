@@ -132,6 +132,35 @@ class DB {
         return $tasks;
     }
 
+    public function getTasksByPrefix($prefix) {
+
+        // On blank prefix, return first page of All Tasks
+        if (strlen($prefix) === 0) {
+            return $this->getAllTasks(1);
+        }
+
+        $likePrefix = $prefix . '%';
+        $stmt = $this->_conn->prepare(
+            "SELECT id 
+            FROM tasks 
+            WHERE title LIKE ?
+            ORDER BY id DESC"
+        );
+        $stmt->bind_param("s", $likePrefix);
+
+        $stmt->execute();
+
+        $results = $stmt->get_result();
+        $stmt->close();
+
+        $tasks = [];
+        while ($row = $results->fetch_assoc()) {
+            $tasks[] = $this->getTask($row['id']);
+        }
+
+        return $tasks;
+    }
+
     public function getDueTasks() {
         $stmt = $this->_conn->prepare("
             SELECT tasks_id
