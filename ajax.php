@@ -59,6 +59,13 @@ try {
             $repeatPolicy = $_REQUEST['repeat_policy'];
 
             $db->addTaskReview($taskId, $reviewDate, $repeatPolicy);
+            break;
+
+        case 'add_session':
+            $sessonInput = $_REQUEST['session'];
+            $result = $db->addSession($sessonInput);
+
+            break;
     }
 
     $db->commit();

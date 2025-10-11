@@ -443,6 +443,7 @@ class DB {
 
         $insertStmt = $this->_conn->prepare("INSERT INTO sessions(name, description, due_date) VALUES(?, ?, ?)");
         $insertStmt->bind_param("sss", $name, $description, $dueDate);
+        $insertStmt->execute();
         $sessionId = $insertStmt->insert_id;
         $insertStmt->close();
 
@@ -461,7 +462,7 @@ class DB {
                 sessions.due_date,
                 sessions.completed_date,
 
-                GROUP_CONCAT(sessions_task_occurences.tasks_id) AS taskOccurenceIds
+                GROUP_CONCAT(sessions_task_occurences.task_occurences_id) AS taskOccurenceIds
 
             FROM sessions
                 JOIN sessions_task_occurences ON sessions_task_occurences.sessions_id = sessions.id
@@ -530,6 +531,8 @@ class DB {
 
             if ($lastTaskOccurence['status'] === self::STATUS_TASK_COMPLETED) {
                 $taskOccurencesIdArr[] = $this->addTaskOcccurence($taskId, $dueDate);
+            } else {
+                $taskOccurencesIdArr[] =  $lastTaskOccurence['id'];
             }
         }
 

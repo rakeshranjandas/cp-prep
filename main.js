@@ -153,9 +153,24 @@ let App = {
 
     },
 
-    addSession: function() {
+    addEditSession: function() {
+        event.preventDefault();
 
+        let session = SessionModal.getSessionForm();
+        if (!session) {
+            return;
+        }
+
+        Service.addEditSession(session, () => {
+            if (session.id == 0) {
+                this.renderAll();
+                SessionModal.close();
+            } else {
+                this.renderAll(() => SessionModal.showPreview(session.id));
+            }
+        })
     },
+
 
     editSession: function() {
 
@@ -396,6 +411,29 @@ const SessionModal = {
         })
     },
 
+    getSessionForm: function() {
+        const name = $('#sessionName').val().trim();
+        if (!name) {
+            alert('Name is required.');
+            return null;
+        }
+
+        if (this._selectedTasks.length === 0) {
+            alert("No tasks selected.");
+            return null;
+        }
+
+        const sessionData = {
+            id: $('#sessionIdHidden').val(),
+            name: name,
+            description: $('#sessionDescription').val(),
+            due_date: $('#sessionDueDate').val().trim(),
+            tasks: this._selectedTasks.map((t) => t.id)
+        };
+
+        return sessionData;
+    }
+
 };
 
 let Service = {
@@ -524,8 +562,12 @@ let Service = {
 
     },
 
-    addSession: function() {
-
+    addEditSession: function(session, onSuccess) {
+        this._doAjax(
+            { action: 'add_session', session: session },
+            () => onSuccess(),
+            "POST"
+        );
     }
 }
 

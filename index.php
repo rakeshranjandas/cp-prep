@@ -577,7 +577,7 @@
             </div>
             <div class="formField">
                 <label for="sessionDueDate">Due Date</label>
-                <input type="date" id="sessionDueDate" name="sessionDueDate" class="textFieldInput">
+                <input type="date" id="sessionDueDate" name="sessionDueDate" class="textFieldInput" value="<?php echo date('Y-m-d');?>">
             </div>
             <div class="formField">
                 <label for="sessionTasks">Select Tasks</label>
