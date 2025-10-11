@@ -427,7 +427,7 @@
 
 				<div style="display:flex;align-items:center;gap:8px;justify-content:right">
                         <span style="font-size:13px;color:var(--muted)">Show completed</span>
-                        <div id="sessionsSwitch" class="switch on" role="button" aria-pressed="false">
+                        <div id="sessionsSwitch" class="switch" role="button" aria-pressed="false" onclick="App.showCompletedSwitched()">
                             <div class="knob"></div>
                         </div>
                     </div>
@@ -465,8 +465,9 @@
 				</table>
 
 				<div class="pagination-controls">
-                    <button class="button prev-button" id="sessionsPrev"><</button>
-                    <button class="button next-button" id="sessionsNext">></button>
+                    <button class="button prev-button" id="sessionsPrev" title="Prev" onclick="App.prevPageSessions()"><</button>
+					<span id="sessionsTablePageNumber" class="table-page-number">1</span>
+                    <button class="button next-button" id="sessionsNext" title="Next" onclick="App.nextPageSessions()">></button>
                 </div>
 			</div>
 		</div>
@@ -605,67 +606,11 @@
 </div>
 
 	<script>
-		
-		// jQuery version: toggle completed sessions visibility
-		$(function(){
-			var $switch = $('#sessionsSwitch');
-			var $rows = $('#sessionsTable tbody tr');
-
-			function setSwitch(on){
-				if(on){
-					$switch.addClass('on').attr('aria-pressed','true');
-				} else {
-					$switch.removeClass('on').attr('aria-pressed','false');
-				}
-			}
-
-			function update(){
-				var show = $switch.hasClass('on');
-				$rows.each(function(){
-					var $r = $(this);
-					var isCompleted = $r.data('status') === 'completed' || $r.hasClass('status-completed');
-					$r.toggle(show || !isCompleted);
-				});
-			}
-
-			// clicking the UI switch toggles it
-			$switch.on('click', function(){
-				var on = !$switch.hasClass('on');
-				setSwitch(on);
-				update();
-			});
-
-			// initialize
-			setSwitch(false);
-			update();
-		});
 
 		$(function() {
 			App.renderAll();
 		});
 
-		$(document).ready(function() {
-			// $('#taskFilter').on('input', function() {
-			// 	const filter = $(this).val().toLowerCase();
-			// 	$('#taskTable tbody tr').each(function() {
-			// 		const taskName = $(this).find('td:nth-child(2)').text().toLowerCase();
-			// 		const platform = $(this).find('td:nth-child(3)').text().toLowerCase();
-			// 		$(this).toggle(taskName.includes(filter) || platform.includes(filter));
-			// 	});
-			// });
-
-			// $('#taskTable input[type="checkbox"]').on('change', function() {
-			// 	const $checkbox = $(this);
-			// 	const taskName = $checkbox.closest('tr').find('td:nth-child(2)').text();
-			// 	const taskId = $checkbox.val();
-
-			// 	if ($checkbox.is(':checked')) {
-			// 		$('#selectedTasksList').append(`<li data-task-id="${taskId}" ondblclick="alert('s');">${taskName}</li>`);
-			// 	} else {
-			// 		$(`#selectedTasksList li[data-task-id="${taskId}"]`).remove();
-			// 	}
-			// });
-		});
 	</script>
 </body>
 </html>

@@ -495,32 +495,37 @@ class DB {
         return $session;
     }
 
-    public function getAllSessions() {
-        $stmt = $this->_conn->prepare("
-            SELECT id, name, description, status, due_date, completed_date
-            FROM sessions
-            ORDER BY id DESC
-        ");
+    public function getAllSessions($page, $showCompleted = FALSE) {
+        $stmt = '';
+
+        if ($showCompleted) {
+            $stmt = $this->_conn->prepare(
+                "
+                SELECT id
+                FROM sessions
+                ORDER BY due_date ASC
+                LIMIT ".self::SESSIONS_PER_PAGE." OFFSET ".((int)$page - 1) * self::SESSIONS_PER_PAGE
+            );
+        } else {
+            $stmt = $this->_conn->prepare(
+                "
+                SELECT id
+                FROM sessions
+                WHERE status IN ('".self::STATUS_TASK_IN_PROGRESS."', '".self::STATUS_TASK_PENDING."')
+                ORDER BY due_date ASC
+                LIMIT ".self::SESSIONS_PER_PAGE." OFFSET ".((int)$page - 1) * self::SESSIONS_PER_PAGE
+            );
+        }
 
         $stmt->execute();
         $results = $stmt->get_result();
 
-        return $results->fetch_all(MYSQLI_ASSOC);
-    }
+        $sessions = [];
+        while ($row = $results->fetch_assoc()) {
+            $sessions[] = $this->getSession($row['id']);
+        }
 
-
-    public function getActiveSessions() {
-        $stmt = $this->_conn->prepare("
-            SELECT id, name, description, status, due_date, completed_date
-            FROM sessions
-            WHERE status IN ('".self::STATUS_TASK_IN_PROGRESS."', '".self::STATUS_TASK_PENDING."')
-            ORDER BY due_date DESC
-        ");
-
-        $stmt->execute();
-        $results = $stmt->get_result();
-
-        return $results->fetch_all(MYSQLI_ASSOC);
+        return $sessions;
     }
 
     public function addTasksForSession($sessionId, $tasksIdArr, $dueDate) {

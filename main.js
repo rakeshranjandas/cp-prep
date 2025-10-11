@@ -127,30 +127,73 @@ let App = {
             page = $('#sessionsTablePageNumber').text();
         }
 
-        Service.getAllSessions({page: page}, (sessions) => {
-            const $tbody = $('#sessionsTable tbody');
-            $tbody.empty();
-            sessions.forEach(session => {
-                $tbody.append(`
-                    <tr>
-                        <td onclick="SessionModal.showPreview(${session.id})">${session.name}</td>
-                        <td>${session.dueDate}</td>
-                        <td><span class="status ${session.status.toLowerCase().replace(' ', '')}">${session.status}</span></td>
-                    </tr>
-                `);
-            });
+        let showCompleted = $('#sessionsSwitch').attr('aria-pressed') === 'true' ? 1: 0;
 
+        Service.getAllSessions({ page: page, show_completed: showCompleted }, (sessions) => {
+            this._renderSessionsTable(sessions);
             if (onComplete) onComplete();
         });
+    },
+
+    _renderSessionsTable: function(sessions) {
+        const $tbody = $('#sessionsTable tbody');
+        $tbody.empty();
+        sessions.forEach(session => {
+            $tbody.append(`
+                <tr data-status="inprogress">
+                    <td>${session.name}</td>
+                    <td>${formatDate(session.due_date)}</td>
+                    <td><span class="status ${session.status.toLowerCase().replace(' ', '')}">${session.status.toLowerCase()}</span></td>
+                </tr>
+            `);
+        });
+    },
+
+    showCompletedSwitched: function() {
+        let $switch = $('#sessionsSwitch');
+        let currentStateIsOn = $switch.attr('aria-pressed') === 'true';
+
+        if (currentStateIsOn) {
+            $switch.removeClass('on').attr('aria-pressed','false');
+
+        } else {
+            $switch.addClass('on').attr('aria-pressed','true');
+        }
+
+        this.renderSessions();
 
     },
 
     nextPageSessions: function() {
+        let page = parseInt($('#sessionsTablePageNumber').text());
+        let showCompleted = $('#sessionsSwitch').attr('aria-pressed') === 'true' ? 1: 0;
 
+        Service.getAllSessions({ page: page+1, show_completed: showCompleted }, (sessions) => {
+            if (sessions.length == 0) {
+                return;
+            }
+
+            this._renderSessionsTable(sessions);
+            $('#sessionsTablePageNumber').text(page+1)
+        });
     },
 
     prevPageSessions: function() {
+        let page = parseInt($('#sessionsTablePageNumber').text());
+        if (page == 1) {
+            return;
+        }
 
+        let showCompleted = $('#sessionsSwitch').attr('aria-pressed') === 'true' ? 1: 0;
+
+        Service.getAllSessions({ page: page-1, show_completed: showCompleted }, (sessions) => {
+            if (sessions.length == 0) {
+                return;
+            }
+
+            this._renderSessionsTable(sessions);
+            $('#sessionsTablePageNumber').text(page-1)
+        });
     },
 
     addEditSession: function() {
@@ -323,6 +366,7 @@ const SessionModal = {
         $('#sessionModalTitle').text('New Session');
         $('#sessionPreview').hide();
         $('#sessionForm').show();
+        $('#sessionForm')[0].reset();
         $('#sessionModal').fadeIn();
         this._selectedTasks = [];
         this.searchTasks();
@@ -439,6 +483,7 @@ const SessionModal = {
 let Service = {
 
     _cachedTasks: {},
+    _cachedSessions: {},
 
     // Variables used to render the output of the last sent ajax call
     _lastGetTasksByPrefixSent: 0, 
@@ -446,6 +491,10 @@ let Service = {
 
     _cacheTasks: function(tasks) {
         tasks.forEach((task) => {this._cachedTasks[task.id] = task});
+    },
+
+    _cacheSessions: function(sessions) {
+        sessions.forEach((session) => {this._cachedSessions[session.id] = session});
     },
 
     _doAjax: function(data, onSuccess, method = "POST") {
@@ -548,18 +597,14 @@ let Service = {
     },
 
     getAllSessions: function(params, onSuccess) {
-        let sessionsData = Array.from({ length: 5 }, (_, i) => ({
-            id: i,
-            name: `Session ${i + 1}`,
-            dueDate: `2025-10-${(i % 30 + 1).toString().padStart(2, '0')}`,
-            status: i % 3 === 0 ? 'In progress' : i % 3 === 1 ? 'Pending' : 'Completed'
-        }));
-
-        onSuccess(sessionsData);
-    },
-
-    getSession: function(sessionId) {
-
+        this._doAjax(
+            { action: "get_all_sessions", page: params.page, show_completed: params.show_completed },
+            (sessions) => {
+                this._cacheSessions(sessions);
+                onSuccess(sessions)
+            },
+            "GET"
+        );
     },
 
     addEditSession: function(session, onSuccess) {

@@ -61,10 +61,15 @@ try {
             $db->addTaskReview($taskId, $reviewDate, $repeatPolicy);
             break;
 
+        case 'get_all_sessions':
+            $page = $_REQUEST['page'];
+            $showCompleted = $_REQUEST['show_completed'];
+            $result = $db->getAllSessions($page, $showCompleted);
+            break;
+
         case 'add_session':
             $sessonInput = $_REQUEST['session'];
             $result = $db->addSession($sessonInput);
-
             break;
     }
 
