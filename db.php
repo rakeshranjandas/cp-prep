@@ -353,6 +353,8 @@ class DB {
         $stmt->bind_param("i", $taskOccurenceId);
         $stmt->execute();
         $stmt->close();
+
+        $this->updateSessionStatusFromTaskOccurence($taskOccurenceId);
     }
 
     public function updateTaskOccurenceStatusToCompleted($taskOccurenceId) {
@@ -362,10 +364,12 @@ class DB {
         $stmt->close();
 
         $newTaskOccurence = $this->addNewRepeatTaskOccurence($taskOccurenceId);
+        $this->updateSessionStatusFromTaskOccurence($taskOccurenceId);
 
         if (!$newTaskOccurence) {
             return ['new_repeat_task_occurence_added' => FALSE];
         }
+
 
         return [
             'new_repeat_task_occurence_added' => TRUE,
@@ -379,6 +383,8 @@ class DB {
         $stmt->bind_param("i", $taskOccurenceId);
         $stmt->execute();
         $stmt->close();
+
+        $this->updateSessionStatusFromTaskOccurence($taskOccurenceId);
     }
 
     private function addNewRepeatTaskOccurence($taskOccurenceId) {
@@ -448,6 +454,7 @@ class DB {
         $insertStmt->close();
 
         $this->addTasksForSession($sessionId, $tasksIdArr, $dueDate);
+        $this->updateSessionStatus($sessionId);
 
         return $this->getSession($sessionId);
     }
@@ -548,6 +555,45 @@ class DB {
         }
     }
 
+    private function updateSessionStatusFromTaskOccurence($taskOccurenceId) {
+        $stmt = $this->_conn->prepare("SELECT sessions_id FROM sessions_task_occurences WHERE task_occurences_id = ?");
+        $stmt->bind_param("i", $taskOccurenceId);
+        $stmt->execute();
 
+        $results = $stmt->get_result();
+        while ($row = $results->fetch_assoc()) {
+            $this->updateSessionStatus($row['sessions_id']);
+        }
+    }
+
+    private function updateSessionStatus($sessionId) {
+        $session = $this->getSession($sessionId);
+
+        $countCompleted = 0;
+        $countPending = 0;
+        foreach ($session['tasks'] as $taskOccurence) {
+            if ($taskOccurence['status'] === self::STATUS_TASK_COMPLETED) {
+                $countCompleted++;
+
+            } else if ($taskOccurence['status'] === self::STATUS_TASK_PENDING) {
+                $countPending++;
+            }
+        }
+
+        $updateStatus = '';
+        if ($countCompleted === count($session['tasks'])) {
+            $updateStatus = self::STATUS_TASK_COMPLETED;
+
+        } else if ($countPending === count($session['tasks'])) {
+            $updateStatus = self::STATUS_TASK_PENDING;
+
+        } else {
+            $updateStatus = self::STATUS_TASK_IN_PROGRESS;
+        }
+
+        $updateStatusStmt = $this->_conn->prepare("UPDATE sessions SET status = ? WHERE id = ?");
+        $updateStatusStmt->bind_param("si", $updateStatus, $sessionId);
+        $updateStatusStmt->execute();
+    }
 
 }

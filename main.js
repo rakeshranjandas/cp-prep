@@ -1,13 +1,6 @@
 let App = {
 
     renderAll: function(onComplete) {
-        // this.renderTasks(null, () => onComplete);
-        // this.renderSessions(null, onComplete);
-        // this.renderDueTasks(null, onComplete);
-
-
-        // App.updatePreviews()
-
 
         this.renderTasks(null, () => {
             this.renderSessions(null, () => {
@@ -17,6 +10,7 @@ let App = {
                 })
             })
         })
+
     },
 
     updatePreviews: function() {
@@ -520,19 +514,22 @@ let Service = {
     _lastGetTasksByPrefixProcessed: 0,
 
     _cacheTasks: function(tasks) {
+        this._cachedTasks = {};
         tasks.forEach((task) => {this._cachedTasks[task.id] = task});
     },
 
     _cacheSessions: function(sessions) {
+        this._cachedSessions = {};
         sessions.forEach((session) => {this._cachedSessions[session.id] = session});
     },
 
-    _doAjax: function(data, onSuccess, method = "POST") {
+    _doAjax: function(data, onSuccess, method = "POST", async = true) {
         $.ajax({
             url: 'ajax.php',
             method: method,
             data: data,
             dataType: "json",
+            async: async,
             success: function(data) {
                 onSuccess(data);
             },
@@ -554,6 +551,17 @@ let Service = {
     },
 
     getTask: function(taskId) {
+        if (this._cachedTasks[taskId]) {
+            return this._cachedTasks[taskId];
+        }
+
+        this._doAjax(
+            { action: 'get_task', id: taskId },
+            (task) => { this._cachedTasks[taskId] = task },
+            "POST",
+            false
+        );
+
         return this._cachedTasks[taskId];
     },
 
@@ -638,6 +646,17 @@ let Service = {
     },
 
     getSession: function(sessionId) {
+        if (this._cachedSessions[sessionId]) {
+            return this._cachedSessions[sessionId];
+        }
+
+        this._doAjax(
+            { action: 'get_session', id: sessionId },
+            (session) => { this._cachedSessions[sessionId] = session },
+            "POST",
+            false
+        );
+
         return this._cachedSessions[sessionId];
     },
 

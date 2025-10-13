@@ -19,6 +19,11 @@ try {
             $result = $db->getAllTasks($page);
             break;
 
+        case 'get_task':
+            $taskId = $_REQUEST['id'];
+            $result = $db->getTask($taskId);
+            break;
+
         case 'add_task':
             $taskInput = $_REQUEST['task'];
             $result = $db->addTask($taskInput);
@@ -65,6 +70,11 @@ try {
             $page = $_REQUEST['page'];
             $showCompleted = $_REQUEST['show_completed'];
             $result = $db->getAllSessions($page, $showCompleted);
+            break;
+
+        case 'get_session':
+            $sessionId = $_REQUEST['id'];
+            $result = $db->getSession($sessionId);
             break;
 
         case 'add_session':
