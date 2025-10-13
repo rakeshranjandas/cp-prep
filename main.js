@@ -396,7 +396,7 @@ const SessionModal = {
 							<a style="text-decoration:none" href="${cur.url}" target="_blank">🔗</a>
 						</td>
 						<td>
-							<span style="cursor:pointer" onclick="TaskModal.showPreview(${cur.id})">${cur.title}</span>
+							<span style="cursor:pointer" onclick="TaskModal.showPreview(${cur.tasks_id})">${cur.title}</span>
 						</td>
                         <td><span class="status ${cur.status.toLowerCase().replace(' ', '')}">${cur.status.toLowerCase()}</span></td>
                         <td class="taskActionsTd">${_buttonsInReviewTable(cur)}</td>
