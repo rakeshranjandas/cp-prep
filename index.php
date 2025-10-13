@@ -124,7 +124,7 @@
 			font-size: small;
    			color: var(--muted);
 		}
-		.taskTitleView {
+		.taskTitleView, .sessionTitleView {
 			cursor: pointer;
 		}
 		.status {
@@ -143,17 +143,17 @@
 			background: var(--status-completed);
 		}
 
-		#taskPreview > p > strong {
+		#taskPreview > p > strong, #sessionPreview > p > strong {
 			font-size: small;
 			opacity: 0.5;
 		}
 
-		#taskPreview > p > span {
+		#taskPreview > p > span, #sessionPreview > p > span {
 			margin-left: 10px;
 		}
 
 		#previewReviewTable {
-			/* margin-top: 40px; */
+			margin-top: 40px;
 			margin-bottom: 50px;
 		}
 
@@ -188,6 +188,35 @@
 			display: table;
 			width: 100%;
 			table-layout: fixed;
+		}
+
+		#sessionTasksReviewTable {
+			margin-top: 50px;
+			margin-bottom: 20px;
+		}
+
+		#sessionTasksReviewTable td, #sessionTasksReviewTable th {
+			text-align: center;
+		}
+
+		#sessionTasksReviewTable button {
+			padding: 2px;
+		}
+
+		#sessionTasksReviewTable tbody {
+			display: block;
+			max-height: 300px; /* Adjust the height as needed */
+			overflow-y: auto;
+		}
+
+		#sessionTasksReviewTable thead, #sessionTasksReviewTable tbody tr {
+			display: table;
+			width: 100%;
+			table-layout: fixed;
+		}
+
+		#sessionTasksReviewTable th:nth-child(1), #sessionTasksReviewTable td:nth-child(1) {
+			width: 10px;
 		}
 
 		.tag {
@@ -269,6 +298,10 @@
 			background:#fff;padding:20px;border-radius:8px;width:400px;box-shadow:0 4px 8px rgba(0,0,0,0.2);width:40%;
 		}
 
+		.modal-1 {
+			z-index: 1001;
+		}
+
 		.formField {
 			display: flex;
 			flex-direction: column;
@@ -305,6 +338,11 @@
 			height: 300px;;
 			overflow-y: auto;
 		}
+		
+		.taskActionsTd > button {
+			margin-left: 25px;
+			margin: min(5px, 10%)
+		}
 
 	</style>
 
@@ -320,38 +358,6 @@
 					<li class="due-list-item">
 						<div style="font-weight:bold">Binary Search Practice</div>
 						<div style="font-size:12px;color:var(--muted)">2025-10-05</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Dynamic Programming Session</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-06</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
-					</li>
-					<li class="due-list-item">
-						<div style="font-weight:bold">Graph Theory Review</div>
-						<div style="font-size:12px;color:var(--muted)">2025-10-07</div>
 					</li>
 				</ul>
 			</div>
@@ -384,27 +390,6 @@
 								<td><span class="status inprogress">In progress</span></td>
 								<td>2025-10-05</td>
 								<td><span class="tag">arrays</span><span class="tag">binary-search</span></td>
-							</tr>
-							<tr>
-								<td>Graph Theory Review</td>
-								<td>Codeforces</td>
-								<td><span class="status pending">Pending</span></td>
-								<td>2025-10-07</td>
-								<td><span class="tag">graphs</span><span class="tag">dfs</span></td>
-							</tr>
-							<tr>
-								<td>Dynamic Programming Session</td>
-								<td>AtCoder</td>
-								<td><span class="status inprogress">In progress</span></td>
-								<td>2025-10-06</td>
-								<td><span class="tag">dp</span><span class="tag">memoization</span></td>
-							</tr>
-							<tr>
-								<td>Sorting Algorithms</td>
-								<td>HackerRank</td>
-								<td><span class="status completed">Completed</span></td>
-								<td>2025-09-28</td>
-								<td><span class="tag">sorting</span><span class="tag">divide-and-conquer</span></td>
 							</tr>
 							<!-- Add more rows as needed -->
 						</tbody>
@@ -446,21 +431,6 @@
 							<td>2025-10-05</td>
 							<td><span class="status inprogress">In progress</span></td>
 						</tr>
-						<tr data-status="completed" class="status-completed">
-							<td>Weekly Review</td>
-							<td>2025-09-30</td>
-							<td><span class="status completed">Completed</span></td>
-						</tr>
-						<tr data-status="pending">
-							<td>Graph Workshop</td>
-							<td>2025-10-08</td>
-							<td><span class="status pending">Pending</span></td>
-						</tr>
-						<tr data-status="completed" class="status-completed">
-							<td>Sorting Deep-dive</td>
-							<td>2025-09-25</td>
-							<td><span class="status completed">Completed</span></td>
-						</tr>
 					</tbody>
 				</table>
 
@@ -474,7 +444,7 @@
 	</div>
 
 	<!-- Modal for Task Preview and Edit -->
-	<div id="taskModal" class="modal" style="display: none;">
+	<div id="taskModal" class="modal modal-1" style="display: none;">
 		<div class="modal-content">
 			<h2 id="modalTitle"></h2>
 			<div id="taskPreview" style="display:block;" data-taskid="">
@@ -555,12 +525,37 @@
 	<!-- Modal for Session Preview and Edit -->
 	<div id="sessionModal" class="modal" style="display: none;">
     <div class="modal-content">
-        <h2 class="section-header" id="sessionModalTitle"></h2>
+        <h2 id="sessionModalTitle"></h2>
         <div id="sessionPreview" style="display:block;" data-sessionid="">
-            <p><strong>Name:</strong> <span id="previewSessionName"></span></p>
-            <p><strong>Description:</strong> <span id="previewSessionDescription"></span></p>
-            <p><strong>Due Date:</strong> <span id="previewSessionDueDate"></span></p>
             <p><strong>Status:</strong> <span id="previewSessionStatus"></span></p>
+			<p><strong>Due Date:</strong> <span id="previewSessionDueDate"></span></p>
+            <p><strong>Description:</strong> <span id="previewSessionDescription"></span></p>
+            <table id="sessionTasksReviewTable" class="table">
+                <thead>
+                    <tr>
+						<th></th>
+                        <th>Task</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Example row, replace with dynamic content -->
+                    <tr>
+                        <td>
+							<a style="text-decoration:none" href="www.google.com" target="_blank">🔗</a>
+						</td>
+						<td>
+							<span style="cursor:pointer" onclick="TaskModal.showPreview(2)">Example Task</span>
+						</td>
+                        <td><span class="status pending">pending</span></td>
+                        <td class="taskActionsTd">
+							<button class="button" onclick="SessionModal.markTaskComplete(1)">completed</button>
+							<button class="button" onclick="SessionModal.markTaskComplete(1)">in progress</button>
+						</td>
+                    </tr>
+                </tbody>
+            </table>
             <div style="display:flex;justify-content:space-between;">
                 <button id="editSessionButton" class="button" onclick="SessionModal.showEdit()">Edit</button>
                 <button type="button" id="closeSessionModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="SessionModal.close()">Cancel</button>

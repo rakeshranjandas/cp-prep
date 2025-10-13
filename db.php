@@ -337,7 +337,7 @@ class DB {
             SELECT id, tasks_id, status, added_date, due_date, completed_date
             FROM task_occurences 
             WHERE tasks_id = ? 
-            ORDER BY due_date DESC
+            ORDER BY id DESC
             LIMIT 1
         ");
 

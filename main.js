@@ -1,9 +1,27 @@
 let App = {
 
     renderAll: function(onComplete) {
-        this.renderTasks(null, onComplete);
-        this.renderSessions(null, onComplete);
-        this.renderDueTasks(null, onComplete);
+        // this.renderTasks(null, () => onComplete);
+        // this.renderSessions(null, onComplete);
+        // this.renderDueTasks(null, onComplete);
+
+
+        // App.updatePreviews()
+
+
+        this.renderTasks(null, () => {
+            this.renderSessions(null, () => {
+                this.renderDueTasks(null, () => {
+                    App.updatePreviews();
+                    if (onComplete) onComplete();
+                })
+            })
+        })
+    },
+
+    updatePreviews: function() {
+        TaskModal.updatePreview();
+        SessionModal.updatePreview();
     },
 
     // TASKS
@@ -76,7 +94,7 @@ let App = {
                 this.renderAll();
                 TaskModal.close();
             } else {
-                this.renderAll(() => TaskModal.showPreview(task.id));
+                this.renderAll(() => App.updatePreviews());
             }
         })
     },
@@ -84,7 +102,7 @@ let App = {
     markTaskAsInProgress: function(taskOccurenceId, taskId) {
         Service.updateTaskOccurenceStatusToInProgress(
             taskOccurenceId,
-            () =>  this.renderAll(() => TaskModal.showPreview(taskId))
+            () =>  this.renderAll()
         );
     },
 
@@ -96,7 +114,10 @@ let App = {
                     alert(`Next review to be on ${formatDate(res.new_repeat_task_occurence_date)} as per the repeat policy.`);
                 }
 
-                this.renderAll(() => TaskModal.showPreview(taskId))
+                this.renderAll(() => {
+                    TaskModal.updatePreview();
+                    SessionModal.updatePreview();
+                })
             }
         );
     },
@@ -104,7 +125,7 @@ let App = {
     markTaskAsPending: function(taskOccurenceId, taskId) {
         Service.updateTaskOccurenceStatusToPending(
             taskOccurenceId,
-            () =>  this.renderAll(() => TaskModal.showPreview(taskId))
+            () =>  this.renderAll()
         );
     },
 
@@ -117,7 +138,7 @@ let App = {
             taskId,
             reviewDate,
             repeatPolicy,
-            () => this.renderAll(() => TaskModal.showPreview(taskId))
+            () => this.renderAll()
         )
     },
 
@@ -141,7 +162,7 @@ let App = {
         sessions.forEach(session => {
             $tbody.append(`
                 <tr data-status="inprogress">
-                    <td>${session.name}</td>
+                    <td class="sessionTitleView" onclick="SessionModal.showPreview(${session.id})">${session.name}</td>
                     <td>${formatDate(session.due_date)}</td>
                     <td><span class="status ${session.status.toLowerCase().replace(' ', '')}">${session.status.toLowerCase()}</span></td>
                 </tr>
@@ -209,7 +230,7 @@ let App = {
                 this.renderAll();
                 SessionModal.close();
             } else {
-                this.renderAll(() => SessionModal.showPreview(session.id));
+                this.renderAll();
             }
         })
     },
@@ -270,7 +291,7 @@ let TaskModal = {
                     `<tr>
                         <td>${formatDate(cur.due_date)}</td>
                         <td><span class="status ${cur.status.toLowerCase().replace(' ', '')}">${cur.status.toLowerCase()}</span></td>
-                        <td style="display:flex;justify-content:right;gap:10px">${this._buttonsInReviewTable(cur)}</td>
+                        <td class="taskActionsTd">${_buttonsInReviewTable(cur)}</td>
                     </tr>`;
             }, "")
         );
@@ -298,17 +319,10 @@ let TaskModal = {
         $('#taskModal').show();
     },
 
-    _buttonsInReviewTable: function(taskOccurence) {
-        let status = taskOccurence.status;
-        let id = taskOccurence.id;
-        let taskId = taskOccurence.tasks_id;
-
-        let buttons = "";
-        if (status != "IN PROGRESS") buttons += `<button type="button" class="button" onclick="App.markTaskAsInProgress(${id}, ${taskId})">in progress</button>`;
-        if (status != "PENDING") buttons += `<button type="button" class="button" onclick="App.markTaskAsPending(${id}, ${taskId})">pending</button>`;
-        if (status != "COMPLETED") buttons += `<button type="button" class="button" onclick="App.markTaskAsCompleted(${id}, ${taskId})">completed</button>`;
-
-        return buttons;
+    updatePreview: function() {
+        if ($('#taskModal').is(':visible')) {
+            this.showPreview($('#taskPreview').attr('data-taskid'));
+        }
     },
 
     showEdit: function() {
@@ -373,23 +387,39 @@ const SessionModal = {
     },
 
     showPreview: function(sessionId) {
-        // Fetch session details using sessionId (mocked for now)
-        const session = {
-            name: 'Morning Practice',
-            description: 'Practice session for algorithms.',
-            dueDate: '2025-10-10',
-            status: 'In Progress'
-        };
+        let session = Service.getSession(sessionId);
 
-        $('#previewSessionName').text(session.name);
+        $('#sessionModalTitle').text(session.name);
+        $('#previewSessionStatus').html(`<span class="status ${session.status.toLowerCase().replace(' ', '')}">${session.status.toLowerCase()}</span>`);
+        $('#previewSessionDueDate').text(formatDate(session.due_date));
         $('#previewSessionDescription').text(session.description);
-        $('#previewSessionDueDate').text(session.dueDate);
-        $('#previewSessionStatus').text(session.status);
 
-        $('#sessionModalTitle').text('Session Preview');
+        $('#sessionTasksReviewTable>tbody').html(
+            session.tasks.reduce((prev, cur) => {
+                return prev +
+                    `<tr>
+                        <td>
+							<a style="text-decoration:none" href="${cur.url}" target="_blank">🔗</a>
+						</td>
+						<td>
+							<span style="cursor:pointer" onclick="TaskModal.showPreview(${cur.id})">${cur.title}</span>
+						</td>
+                        <td><span class="status ${cur.status.toLowerCase().replace(' ', '')}">${cur.status.toLowerCase()}</span></td>
+                        <td class="taskActionsTd">${_buttonsInReviewTable(cur)}</td>
+                    </tr>`
+            }, "")
+        );
+
+        $('#sessionPreview').attr("data-sessionid", sessionId);
         $('#sessionPreview').show();
         $('#sessionForm').hide();
         $('#sessionModal').fadeIn();
+    },
+
+    updatePreview: function() {
+        if ($('#sessionModal').is(':visible')) {
+            this.showPreview($('#sessionPreview').attr('data-sessionid'));
+        }
     },
 
     showEdit: function() {
@@ -607,6 +637,10 @@ let Service = {
         );
     },
 
+    getSession: function(sessionId) {
+        return this._cachedSessions[sessionId];
+    },
+
     addEditSession: function(session, onSuccess) {
         this._doAjax(
             { action: 'add_session', session: session },
@@ -625,3 +659,17 @@ function formatDate(dateStr) {
     if (isNaN(date)) return dateStr;
     return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
+
+function _buttonsInReviewTable(taskOccurence) {
+    let status = taskOccurence.status;
+    let id = taskOccurence.id;
+    let taskId = taskOccurence.tasks_id;
+
+    let buttons = "";
+    if (status != "IN PROGRESS") buttons += `<button type="button" class="button" onclick="App.markTaskAsInProgress(${id}, ${taskId})">in progress</button>`;
+    if (status != "PENDING") buttons += `<button type="button" class="button" onclick="App.markTaskAsPending(${id}, ${taskId})">pending</button>`;
+    if (status != "COMPLETED") buttons += `<button type="button" class="button" onclick="App.markTaskAsCompleted(${id}, ${taskId})">completed</button>`;
+
+    return buttons;
+}
+
