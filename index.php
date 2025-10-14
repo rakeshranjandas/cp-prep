@@ -365,7 +365,7 @@
 	
 	<div style="display:flex; justify-content: center;margin-bottom:10px;margin-top:0px">
 		<div class="card" style="cursor: pointer; display: flex; align-items: center; padding:5px" onclick="WatchlistModal.show()">
-			<span style="font-size: x-small; color: green;">&#9658;</span>
+			<span style="font-size: x-small; color: green;">Anime &#9658;</span>
 			<span style="margin-left: 12px; font-weight: bold; color: violet;" class="currentlyWatchingAnime">---</span>
 		</div>
 	</div>
