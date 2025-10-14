@@ -541,6 +541,8 @@ let Service = {
     },
 
     _doAjax: function(data, onSuccess, method = "POST", async = true) {
+        if (!async) Loader.show();
+
         $.ajax({
             url: 'ajax.php',
             method: method,
@@ -548,6 +550,7 @@ let Service = {
             dataType: "json",
             async: async,
             success: function(data) {
+                if (!async) Loader.hide();
                 onSuccess(data);
             },
             error: function(xhr, status, error) {
@@ -709,3 +712,15 @@ function _buttonsInReviewTable(taskOccurence) {
     return buttons;
 }
 
+
+// Loader control methods
+Loader = {
+    show: function() {
+        $("#loaderOverlay").css("display", "flex");
+        $("body").css("overflow", "hidden");
+    },
+    hide: function() {
+        $("#loaderOverlay").css("display", "none");
+        $("body").css("overflow", "auto");
+    }
+};

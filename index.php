@@ -348,7 +348,20 @@
 
 </head>
 <body>
-	<div class="dashboard">
+   <!-- Loader Overlay -->
+   <div id="loaderOverlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.7);z-index:2000;justify-content:center;align-items:center;pointer-events:auto;">
+	   <div style="display:flex;flex-direction:column;align-items:center;">
+		   <div class="loader-spinner" style="border:6px solid #f3f3f3;border-top:6px solid #2563eb;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;"></div>
+		   <div style="margin-top:18px;font-size:18px;color:#2563eb;">Loading...</div>
+	   </div>
+   </div>
+   <style>
+   @keyframes spin {
+	   0% { transform: rotate(0deg); }
+	   100% { transform: rotate(360deg); }
+   }
+   </style>
+   <div class="dashboard">
 		<div class="due-tasks">
 			<div class="card">
 				<div class="sectionHeaderDiv">
@@ -600,12 +613,10 @@
     </div>
 </div>
 
-	<script>
-
-		$(function() {
-			App.renderAll();
-		});
-
-	</script>
+	   <script>
+			$(function() {
+				App.renderAll();
+			});
+	   </script>
 </body>
 </html>
