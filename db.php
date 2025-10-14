@@ -163,11 +163,12 @@ class DB {
 
     public function getDueTasks() {
         $stmt = $this->_conn->prepare("
-            SELECT tasks_id
+            SELECT tasks_id, MIN(due_date) AS next_due_date
             FROM task_occurences
             WHERE due_date <= NOW() + INTERVAL 1 WEEK
                 AND status IN ('".self::STATUS_TASK_IN_PROGRESS."', '".self::STATUS_TASK_PENDING."')
-            ORDER BY due_date ASC
+            GROUP BY tasks_id
+            ORDER BY next_due_date ASC
         ");
 
         $stmt->execute();
@@ -322,7 +323,6 @@ class DB {
             WHERE tasks_id = ?
             ORDER BY id DESC
         ");
-
         $stmt->bind_param("i", $taskId);
         $stmt->execute();
 
@@ -337,7 +337,8 @@ class DB {
             SELECT id, tasks_id, status, added_date, due_date, completed_date
             FROM task_occurences 
             WHERE tasks_id = ? 
-            ORDER BY id DESC
+            AND (status = '" . self::STATUS_TASK_IN_PROGRESS . "' OR status = '" . self::STATUS_TASK_PENDING . "')
+            ORDER BY due_date ASC
             LIMIT 1
         ");
 
@@ -345,7 +346,28 @@ class DB {
         $stmt->execute();
         $results = $stmt->get_result();
 
-        return $results->num_rows ? $results->fetch_assoc() : NULL;
+        if ($results->num_rows) {
+            return $results->fetch_assoc();
+        }
+
+        $stmtCompleted = $this->_conn->prepare("
+            SELECT id, tasks_id, status, added_date, due_date, completed_date
+                FROM task_occurences 
+                WHERE tasks_id = '". self::STATUS_TASK_COMPLETED ."' 
+                AND status = ?
+                ORDER BY due_date ASC
+                LIMIT 1
+        ");
+
+        $stmtCompleted->bind_param("i", $taskId);
+        $stmtCompleted->execute();
+        $results = $stmtCompleted->get_result();
+
+        if ($results->num_rows) {
+            return $results->fetch_assoc;
+        }
+
+        return NULL;
     }
 
     public function updateTaskOccurenceStatusToInProgress($taskOccurenceId) {
