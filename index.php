@@ -390,7 +390,7 @@
 				<div class="sectionHeaderDiv">
 					<div class="section-header">All Tasks</div>
 					<div style="display:flex;gap:12px;align-items:center">
-					<button class="button" onclick="WatchlistModal.showAdd()">New Task</button>
+					<button class="button" onclick="TaskModal.showAdd()">New Task</button>
 				</div>
 				</div>
 
@@ -407,7 +407,7 @@
 						</thead>
 						<tbody>
 							<tr>
-								<td onclick="WatchlistModal.showPreview(1);">Binary Search Practice</td>
+								<td onclick="TaskModal.showPreview(1);">Binary Search Practice</td>
 								<td>LeetCode</td>
 								<td><span class="status inprogress">In progress</span></td>
 								<td>2025-10-05</td>
@@ -494,8 +494,8 @@
 					</tbody>
 				</table>
 				<div style="display:flex;justify-content:space-between;">
-					<button id="editTaskButton" class="button" onclick="WatchlistModal.showEdit()">Edit</button>
-					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="WatchlistModal.close()">Cancel</button>
+					<button id="editTaskButton" class="button" onclick="TaskModal.showEdit()">Edit</button>
+					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="TaskModal.close()">Cancel</button>
 				</div>
 			</div>
 			<form id="taskForm" style="display:none;">
@@ -538,7 +538,7 @@
 				</div>
 				<div style="display:flex;justify-content:space-between;">
 					<button type="submit" class="button" onclick="App.addEditTask()">Save</button>
-					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="WatchlistModal.close()">Cancel</button>
+					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="TaskModal.close()">Cancel</button>
 				</div>
 			</form>
 		</div>
@@ -568,7 +568,7 @@
 							<a style="text-decoration:none" href="www.google.com" target="_blank">🔗</a>
 						</td>
 						<td>
-							<span style="cursor:pointer" onclick="WatchlistModal.showPreview(2)">Example Task</span>
+							<span style="cursor:pointer" onclick="TaskModal.showPreview(2)">Example Task</span>
 						</td>
                         <td><span class="status pending">pending</span></td>
                         <td class="taskActionsTd">
