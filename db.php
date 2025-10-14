@@ -645,4 +645,52 @@ class DB {
         $updateStatusStmt->execute();
     }
 
+    public function getAnimeList() {
+        $stmt = $this->_conn->prepare("SELECT id, name, status FROM anime");
+        $stmt->execute();
+        $results = $stmt->get_result();
+        $stmt->close();
+
+        return $results->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function addAnime($name) {
+        $stmt = $this->_conn->prepare("INSERT INTO anime(name) VALUES(?)");
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    public function watchAnime($id) {
+        $ustmt = $this->_conn->prepare("UPDATE anime SET status = 'ADDED' WHERE status = 'WATCHING'");
+        $ustmt->execute();
+        $ustmt->close();
+
+        $stmt = $this->_conn->prepare("UPDATE anime SET status = 'WATCHING', started_watching = NOW() WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    public function removeAnime($id) {
+        $stmt = $this->_conn->prepare("DELETE FROM anime WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    public function finishAnime($id) {
+        $stmt = $this->_conn->prepare("UPDATE anime SET status = 'FINISHED', finished_watching = NOW() WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    public function undoFinishedAnime($id) {
+        $stmt = $this->_conn->prepare("UPDATE anime SET status = 'ADDED' WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
 }

@@ -81,6 +81,35 @@ try {
             $sessonInput = $_REQUEST['session'];
             $result = $db->addSession($sessonInput);
             break;
+
+        case 'get_anime_list':
+            $result = $db->getAnimeList();
+            break;
+
+        case 'add_anime':
+            $name = $_REQUEST['name'];
+            $db->addAnime($name);
+            break;
+
+        case 'watch_anime':
+            $id = $_REQUEST['id'];
+            $db->watchAnime($id);
+            break;
+
+        case 'finish_anime':
+            $id = $_REQUEST['id'];
+            $db->finishAnime($id);
+            break;
+
+        case 'remove_anime':
+            $id = $_REQUEST['id'];
+            $db->removeAnime($id);
+            break;
+
+        case 'undo_finished_anime':
+            $id = $_REQUEST['id'];
+            $db->undoFinishedAnime($id);
+            break;
     }
 
     $db->commit();

@@ -21,7 +21,7 @@
 			--font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 		}
 		html, body {
-			height: 100%;
+			/* height: 100%; */
 		}
 		body {
 			font-family: var(--font-sans);
@@ -29,6 +29,7 @@
 			color: #0f172a;
 			margin: 0;
 			padding: 28px;
+			padding-top: 5px;
 		}
 		.dashboard {
 			/* max-width: 1400px; */
@@ -143,7 +144,7 @@
 			background: var(--status-completed);
 		}
 
-		#taskPreview > p > strong, #sessionPreview > p > strong {
+		#taskPreview > p > strong, #sessionPreview > p > strong, #todoModal strong {
 			font-size: small;
 			opacity: 0.5;
 		}
@@ -360,7 +361,15 @@
 	   0% { transform: rotate(0deg); }
 	   100% { transform: rotate(360deg); }
    }
-   </style>
+	</style>
+	
+	<div style="display:flex; justify-content: center;margin-bottom:10px;margin-top:0px">
+		<div class="card" style="cursor: pointer; display: flex; align-items: center; padding:5px" onclick="WatchlistModal.show()">
+			<span style="font-size: x-small; color: green;">&#9658;</span>
+			<span style="margin-left: 12px; font-weight: bold; color: violet;" class="currentlyWatchingAnime">---</span>
+		</div>
+	</div>
+
    <div class="dashboard">
 		<div class="due-tasks">
 			<div class="card">
@@ -381,7 +390,7 @@
 				<div class="sectionHeaderDiv">
 					<div class="section-header">All Tasks</div>
 					<div style="display:flex;gap:12px;align-items:center">
-					<button class="button" onclick="TaskModal.showAdd()">New Task</button>
+					<button class="button" onclick="WatchlistModal.showAdd()">New Task</button>
 				</div>
 				</div>
 
@@ -398,7 +407,7 @@
 						</thead>
 						<tbody>
 							<tr>
-								<td onclick="TaskModal.showPreview(1);">Binary Search Practice</td>
+								<td onclick="WatchlistModal.showPreview(1);">Binary Search Practice</td>
 								<td>LeetCode</td>
 								<td><span class="status inprogress">In progress</span></td>
 								<td>2025-10-05</td>
@@ -485,8 +494,8 @@
 					</tbody>
 				</table>
 				<div style="display:flex;justify-content:space-between;">
-					<button id="editTaskButton" class="button" onclick="TaskModal.showEdit()">Edit</button>
-					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="TaskModal.close()">Cancel</button>
+					<button id="editTaskButton" class="button" onclick="WatchlistModal.showEdit()">Edit</button>
+					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="WatchlistModal.close()">Cancel</button>
 				</div>
 			</div>
 			<form id="taskForm" style="display:none;">
@@ -529,7 +538,7 @@
 				</div>
 				<div style="display:flex;justify-content:space-between;">
 					<button type="submit" class="button" onclick="App.addEditTask()">Save</button>
-					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="TaskModal.close()">Cancel</button>
+					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="WatchlistModal.close()">Cancel</button>
 				</div>
 			</form>
 		</div>
@@ -559,7 +568,7 @@
 							<a style="text-decoration:none" href="www.google.com" target="_blank">🔗</a>
 						</td>
 						<td>
-							<span style="cursor:pointer" onclick="TaskModal.showPreview(2)">Example Task</span>
+							<span style="cursor:pointer" onclick="WatchlistModal.showPreview(2)">Example Task</span>
 						</td>
                         <td><span class="status pending">pending</span></td>
                         <td class="taskActionsTd">
@@ -613,9 +622,44 @@
     </div>
 </div>
 
+	<!-- Modal for Todos -->
+	<div id="todoModal" class="modal" style="display: none;">
+    <div class="modal-content">
+		<h2>Anime Watchlist</h2>
+        <h2>
+			<strong>Currently watching: </strong> <span style="color:violet; margin-left:10px" class="currentlyWatchingAnime">---</span>
+			<button class="button" style="margin-left:20px;opacity:0.5;" title="Finished watching" id="finishWatchingAnimeButton" data-id="0" onclick="WatchlistModal.finish()">&check;</button>
+		</h2>
+        <div style="margin-bottom: 20px;">
+            <strong>Pending</strong>
+            <ul id="pendingTodoList" style="list-style: none; padding: 0; margin-left: 40px; font-weight: 300">
+                <!-- Dynamic pending todo items will be appended here -->
+            </ul>
+            <div style="margin-top: 10px;">
+                <div style="display: flex; gap: 10px">
+                    <input type="text" id="newTodoInput" class="textFieldInput" placeholder="Add a new anime...">
+                    <button class="button" onclick="WatchlistModal.addTodo()" title="Add">+</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="button" id="toggleCompletedTodos" onclick="WatchlistModal.toggleCompletedSection()">Show Finished</button>
+            <div id="completedTodosSection" style="display: none; margin-top: 20px;">
+                <strong>Finished</strong>
+                <ul id="completedTodoList" style="list-style: none; padding: 0; margin-left: 40px; font-weight: 300; color: gray">
+                    <!-- Dynamic completed todo items will be appended here -->
+                </ul>
+            </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+            <button class="button closeModalButton" style="background: #ccc; color: #000;" onclick="WatchlistModal.close()">Close</button>
+        </div>
+    </div>
+</div>
 	   <script>
 			$(function() {
 				App.renderAll();
+				App.renderAnime();
 			});
 	   </script>
 </body>

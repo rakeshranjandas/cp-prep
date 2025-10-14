@@ -253,6 +253,11 @@ let App = {
             
             if (onComplete) onComplete();
         });
+    },
+
+    // Anime watchlist
+    renderAnime: function(onComplete) {
+        WatchlistModal.refresh();
     }
 
 };
@@ -521,6 +526,110 @@ const SessionModal = {
 
 };
 
+let WatchlistModal = {
+    todos: [],
+    
+    refresh: function() {
+        Service.getAnime((anime) => this.render(anime));
+    },
+
+    show: function() {
+        this.refresh();
+        $("#todoModal").css("display", "flex");
+        $("#newTodoInput").val('');
+    },
+
+    close: function() {
+        $("#todoModal").css("display", "none");
+    },
+
+    addTodo: function() {
+        const name = $("#newTodoInput").val().trim();
+        Service.addAnime(name, () => {
+            $("#newTodoInput").val('');
+            this.refresh()
+        });
+    },
+
+    removeTodo: function(index) {
+        this.todos.splice(index, 1);
+        this.renderTodos();
+    },
+
+    toggleTodo: function(index) {
+        this.todos[index].done = !this.todos[index].done;
+        this.renderTodos();
+    },
+
+    toggleCompletedSection: function() {
+        const section = $("#completedTodosSection");
+        const button = $("#toggleCompletedTodos");
+        if (section.css("display") === "none") {
+            section.css("display", "block");
+            button.text("Hide Finished");
+        } else {
+            section.css("display", "none");
+            button.text("Show Finished");
+        }
+    },
+
+    watch: function(id) {
+        Service.watchAnime(id, () => this.refresh());
+    },
+
+    undo: function(id) {
+        Service.undoFinishedAnime(id, () => this.refresh());
+    },
+
+    remove: function(id) {
+        let doRemove = confirm("Do you want to remove this anime from watchlist?");
+        if (doRemove) {
+            Service.removeAnime(id, () => this.refresh());
+        }
+    },
+    
+    finish: function() {
+        let id = $('#finishWatchingAnimeButton').attr('data-id');
+        if (id == 0) return;
+        Service.finishAnime(id, () => this.refresh());
+    },
+
+    render: function(anime) {
+        const $pending = $("#pendingTodoList");
+        const $finished = $("#completedTodoList");
+        const $currentAnimeName = $('.currentlyWatchingAnime');
+        const $finishWatchingAnimeButton = $('#finishWatchingAnimeButton');
+        $pending.empty();
+        $finished.empty();
+        $currentAnimeName.text("---");
+        $finishWatchingAnimeButton.attr('data-id', "0");
+        
+
+        anime.forEach((anime) => {
+            const animeRow = $(
+                `<li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span>${anime.name}</span>
+                    <div>
+                        <button class="button" ${anime.status==='WATCHING'?'style="display:none"': ''} onclick="WatchlistModal.${anime.status==='ADDED'?'watch':'undo'}(${anime.id})">${anime.status==='FINISHED' ? '&#9100;' : '&#9658;'}</button>
+                        <button class="button" style="background: red; color: white;" onclick="WatchlistModal.remove(${anime.id})">X</button>
+                    </div>
+                </li>`
+            );
+
+            if (anime.status === 'FINISHED') {
+                $finished.append(animeRow);
+                
+            } else {
+                $pending.append(animeRow);
+                if (anime.status === 'WATCHING') {
+                    $currentAnimeName.text(anime.name);
+                    $finishWatchingAnimeButton.attr('data-id', anime.id);
+                }
+            }
+        });
+    }
+};
+
 let Service = {
 
     _cachedTasks: {},
@@ -686,9 +795,56 @@ let Service = {
             () => onSuccess(),
             "POST"
         );
+    },
+
+    getAnime: function(onSuccess) {
+        this._doAjax(
+            { action: 'get_anime_list' },
+            (anime) => onSuccess(anime),
+            "GET"
+        )
+    },
+
+    addAnime: function(name, onSuccess) {
+        this._doAjax(
+            { action: 'add_anime', name: name },
+            () => onSuccess(),
+            "POST"
+        );
+    },
+
+    watchAnime: function(id, onSuccess) {
+        this._doAjax(
+            { action: 'watch_anime', id: id },
+            () => onSuccess(),
+            "POST"
+        );
+    },
+
+    finishAnime: function(id, onSuccess) {
+        this._doAjax(
+            { action: 'finish_anime', id: id},
+            () => onSuccess(),
+            "POST"
+        );
+    },
+
+    removeAnime: function(id, onSuccess) {
+        this._doAjax(
+            { action: 'remove_anime', id: id },
+            () => onSuccess(),
+            "POST"
+        );
+    },
+
+    undoFinishedAnime: function(id, onSuccess) {
+        this._doAjax(
+            { action: 'undo_finished_anime', id: id },
+            () => onSuccess(),
+            "POST"
+        );
     }
 }
-
 
 
 // HELPERS
