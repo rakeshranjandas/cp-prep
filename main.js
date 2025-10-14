@@ -407,7 +407,7 @@ const SessionModal = {
         $('#sessionPreview').attr("data-sessionid", sessionId);
         $('#sessionPreview').show();
         $('#sessionForm').hide();
-        $('#sessionModal').fadeIn();
+        $('#sessionModal').show();
     },
 
     updatePreview: function() {
@@ -417,9 +417,26 @@ const SessionModal = {
     },
 
     showEdit: function() {
-        $('#sessionModalTitle').text('Edit Session');
+        let sessionId =  $('#sessionPreview').attr("data-sessionId");
+        let session = Service.getSession(sessionId);
+
+        $('#sessionIdHidden').val(sessionId);
+        $('#sessionModalTitle').text('Edit Task');
+        $('#sessionName').val(session.name);
+        $('#sessionDescription').val(session.description);
+        $('#sessionDueDate').val(session.due_date.split(' ')[0]);
+
+        this._selectedTasks = session.tasks.map((t) => {
+            return {
+                id: t.tasks_id,
+                title: t.title
+            };
+        });
+        this.searchTasks();
+
         $('#sessionPreview').hide();
         $('#sessionForm').show();
+        $('#sessionModal').show();
     },
 
     close: function() {

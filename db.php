@@ -442,18 +442,45 @@ class DB {
     }
 
     public function addSession($session) {
+        $sessionId = $session['id'];
         $name = $session['name'];
         $description = $session['description'];
         $dueDate = $session['due_date'];
         $tasksIdArr = $session['tasks'];
 
-        $insertStmt = $this->_conn->prepare("INSERT INTO sessions(name, description, due_date) VALUES(?, ?, ?)");
-        $insertStmt->bind_param("sss", $name, $description, $dueDate);
-        $insertStmt->execute();
-        $sessionId = $insertStmt->insert_id;
-        $insertStmt->close();
+        if ($sessionId == 0) {
+            $insertStmt = $this->_conn->prepare("INSERT INTO sessions(name, description, due_date) VALUES(?, ?, ?)");
+            $insertStmt->bind_param("sss", $name, $description, $dueDate);
+            $insertStmt->execute();
+            $sessionId = $insertStmt->insert_id;
+            $insertStmt->close();
 
-        $this->addTasksForSession($sessionId, $tasksIdArr, $dueDate);
+            $this->addTasksForSession($sessionId, $tasksIdArr, $dueDate);
+
+        } else {
+            $existingSession = $this->getSession($sessionId);
+            $existingTaskOccurences = $existingSession['tasks'];
+
+            $updateStmt = $this->_conn->prepare("UPDATE sessions SET name = ?, description = ?, due_date = ? WHERE id = ?");
+            $updateStmt->bind_param("sssi", $name, $description, $dueDate, $sessionId);
+            $updateStmt->execute();
+            $updateStmt->close();
+
+            // remove that are not present anymore
+            foreach ($existingTaskOccurences as $existingTaskOccurence) {
+                if (!in_array($existingTaskOccurence['tasks_id'], $tasksIdArr)) {
+                    $deleteTaskOccurenceStmt = $this->_conn->prepare("DELETE FROM sessions_task_occurences WHERE task_occurences_id = ? AND sessions_id = ?");
+                    $deleteTaskOccurenceStmt->bind_param("ii", $existingTaskOccurence['id'], $sessionId);
+                    $deleteTaskOccurenceStmt->execute();
+                }
+            }
+
+            // add new ones
+            $existingTaskIds = array_map(function ($t) { return $t['tasks_id']; }, $existingTaskOccurences);
+            $tasksIdToAdd = array_diff($tasksIdArr, $existingTaskIds);
+            $this->addTasksForSession($sessionId, $tasksIdToAdd, $dueDate);
+        }
+
         $this->updateSessionStatus($sessionId);
 
         return $this->getSession($sessionId);
