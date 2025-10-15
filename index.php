@@ -493,9 +493,10 @@
 					<tbody>
 					</tbody>
 				</table>
-				<div style="display:flex;justify-content:space-between;">
+				<div style="display:flex;">
 					<button id="editTaskButton" class="button" onclick="TaskModal.showEdit()">Edit</button>
-					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="TaskModal.close()">Cancel</button>
+					<button class="button" style="background: red; color: white; margin-left: 10px" onclick="TaskModal.remove()">Remove</button>
+					<button type="button" id="closeModal" class="button closeModalButton" style="background:#ccc;color:#000;margin-left:auto" onclick="TaskModal.close()">Cancel</button>
 				</div>
 			</div>
 			<form id="taskForm" style="display:none;">
@@ -578,9 +579,10 @@
                     </tr>
                 </tbody>
             </table>
-            <div style="display:flex;justify-content:space-between;">
+            <div style="display:flex;">
                 <button id="editSessionButton" class="button" onclick="SessionModal.showEdit()">Edit</button>
-                <button type="button" id="closeSessionModal" class="button closeModalButton" style="background:#ccc;color:#000;" onclick="SessionModal.close()">Cancel</button>
+				<button class="button" style="background: red; color: white; margin-left: 10px" onclick="SessionModal.remove()">Remove</button>
+                <button type="button" id="closeSessionModal" class="button closeModalButton" style="background:#ccc;color:#000;margin-left:auto" onclick="SessionModal.close()">Cancel</button>
             </div>
         </div>
         <form id="sessionForm" style="display:none;">

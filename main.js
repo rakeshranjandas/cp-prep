@@ -93,6 +93,19 @@ let App = {
         })
     },
 
+    removeTask: function(taskId) {
+        let ok = confirm("Do you want to delete this task?");
+        if (!ok) return;
+        let okok = confirm("Do you REALLY want to delete this task?");
+        if (!okok) return;
+
+        Service.removeTask(taskId, () => {
+            this.renderAllTables();
+            TaskModal.close();
+            SessionModal.updatePreview();
+        });
+    },
+
     markTaskAsInProgress: function(taskOccurenceId, taskId) {
         Service.updateTaskOccurenceStatusToInProgress(
             taskOccurenceId,
@@ -239,6 +252,18 @@ let App = {
         })
     },
 
+    removeSession: function(sessionId) {
+        let ok = confirm("Do you want to delete this session?");
+        if (!ok) return;
+        let okok = confirm("Do you REALLY want to delete this session?");
+        if (!okok) return;
+
+        Service.removeSession(sessionId, () => {
+            SessionModal.close();
+            this.renderAllTables();
+        });
+    },
+
     // DUE
     renderDueTasks: function(page, onComplete) {
         Service.getDueTasks((dueTasks) => {
@@ -277,7 +302,7 @@ let TaskModal = {
         $('#taskForm')[0].reset();
         $('#taskPreview').hide();
         $('#taskForm').show();
-        $('#taskModal').show();
+        $('#taskModal').fadeIn();
     },
 
     showPreview: function(taskId) {
@@ -320,7 +345,7 @@ let TaskModal = {
         $('#taskPreview').attr("data-taskid", taskId);
         $('#taskPreview').show();
         $('#taskForm').hide();
-        $('#taskModal').show();
+        $('#taskModal').fadeIn();
     },
 
     updatePreview: function() {
@@ -345,11 +370,17 @@ let TaskModal = {
 
         $('#taskPreview').hide();
         $('#taskForm').show();
-        $('#taskModal').show();
+        $('#taskModal').fadeIn();
+    },
+
+    remove: function() {
+        event.preventDefault();
+        let taskId =  $('#taskPreview').attr("data-taskid");
+        App.removeTask(taskId);
     },
 
     close: function() {
-        $('#taskModal').hide();
+        $('#taskModal').fadeOut();
     },
 
     getTaskForm: function() {
@@ -417,7 +448,7 @@ const SessionModal = {
         $('#sessionPreview').attr("data-sessionid", sessionId);
         $('#sessionPreview').show();
         $('#sessionForm').hide();
-        $('#sessionModal').show();
+        $('#sessionModal').fadeIn();
     },
 
     updatePreview: function() {         
@@ -443,11 +474,18 @@ const SessionModal = {
                 title: t.title
             };
         });
-        this.searchTasks();
 
         $('#sessionPreview').hide();
         $('#sessionForm').show();
-        $('#sessionModal').show();
+        $('#sessionModal').fadeIn();
+
+        this.searchTasks();
+    },
+
+    remove: function() {
+        event.preventDefault();
+        let sessionId =  $('#sessionPreview').attr("data-sessionId");
+        App.removeSession(sessionId);
     },
 
     close: function() {
@@ -739,6 +777,14 @@ let Service = {
         );
     },
 
+    removeTask: function(taskId, onSuccess) {
+        this._doAjax(
+            { action: 'remove_task', id: taskId },
+            () => onSuccess(),
+            "POST"
+        );
+    },
+
     updateTaskOccurenceStatusToInProgress: function(taskOccurenceId, onSuccess) {
         this._doAjax(
             { action: "update_task_status_to_in_progress", task_occurences_id: taskOccurenceId },
@@ -801,6 +847,14 @@ let Service = {
         this._doAjax(
             { action: 'add_session', session: session },
             (res) => onSuccess(res),
+            "POST"
+        );
+    },
+
+    removeSession: function(sessionId, onSuccess) {
+        this._doAjax(
+            { action: 'remove_session', id: sessionId },
+            () => onSuccess(),
             "POST"
         );
     },

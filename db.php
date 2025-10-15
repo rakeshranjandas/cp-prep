@@ -85,6 +85,40 @@ class DB {
         return $this->getTask($taskId);
     }
 
+    public function removeTask($taskId) {
+
+        // Remove from session_task_occurences
+        $stmt = $this->_conn->prepare("DELETE FROM sessions_task_occurences WHERE task_occurences_id IN (SELECT id FROM task_occurences WHERE tasks_id = ?)");
+        $stmt->bind_param("i", $taskId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Remove from task_occurences
+        $stmt = $this->_conn->prepare("DELETE FROM task_occurences WHERE tasks_id = ?");
+        $stmt->bind_param("i", $taskId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Remove from tasks_repeat
+        $stmt = $this->_conn->prepare("DELETE FROM tasks_repeat WHERE tasks_id = ?");
+        $stmt->bind_param("i", $taskId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Remove from tasks_tags
+        $stmt = $this->_conn->prepare("DELETE FROM tasks_tags WHERE tasks_id = ?");
+        $stmt->bind_param("i", $taskId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Remove from tasks
+        $stmt = $this->_conn->prepare("DELETE FROM tasks WHERE id = ?");
+        $stmt->bind_param("i", $taskId);
+        $stmt->execute();
+        $stmt->close();
+
+    }
+
     public function getTask($taskId) {
         $stmt = $this->_conn->prepare("SELECT id, title, description, url, platform FROM tasks WHERE id = ?");
         $stmt->bind_param("i", $taskId);
@@ -508,6 +542,20 @@ class DB {
         return $this->getSession($sessionId);
     }
 
+    public function removeSession($sessionId) {
+        // Remove from sessions_task_occurences
+        $stmt = $this->_conn->prepare("DELETE FROM sessions_task_occurences WHERE sessions_id = ?");
+        $stmt->bind_param("i", $sessionId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Remove from sessions
+        $stmt = $this->_conn->prepare("DELETE FROM sessions WHERE id = ?");
+        $stmt->bind_param("i", $sessionId);
+        $stmt->execute();
+        $stmt->close();
+    }
+
     public function getSession($sessionId) {
         $stmt = $this->_conn->prepare("
             SELECT 
@@ -521,7 +569,7 @@ class DB {
                 GROUP_CONCAT(sessions_task_occurences.task_occurences_id) AS taskOccurenceIds
 
             FROM sessions
-                JOIN sessions_task_occurences ON sessions_task_occurences.sessions_id = sessions.id
+                LEFT JOIN sessions_task_occurences ON sessions_task_occurences.sessions_id = sessions.id
 
             WHERE sessions.id = ?
 
@@ -539,11 +587,14 @@ class DB {
         }
 
         $session = $results->fetch_assoc();
-        $taskOccurenceIdArr = explode(",", $session['taskOccurenceIds']);
+        $taskOccurenceIdArr = explode(",", $session['taskOccurenceIds'] ?? "");
         $tasks = [];
 
         foreach ($taskOccurenceIdArr as $taskOccurenceId) {
-            $tasks[] = $this->getTaskOccurence($taskOccurenceId);
+            $taskOccurence = $this->getTaskOccurence($taskOccurenceId);
+            if ($taskOccurence) {
+                $tasks[] = $taskOccurence;
+            }
         };
 
         $session['tasks'] = $tasks;

@@ -29,6 +29,11 @@ try {
             $result = $db->addTask($taskInput);
             break;
 
+        case 'remove_task':
+            $taskId = $_REQUEST['id'];
+            $db->removeTask($taskId);
+            break;
+
         case 'get_due_tasks':
             $result = $db->getDueTasks();
             break;
@@ -80,6 +85,11 @@ try {
         case 'add_session':
             $sessonInput = $_REQUEST['session'];
             $result = $db->addSession($sessonInput);
+            break;
+
+        case 'remove_session':
+            $sessionId = $_REQUEST['id'];
+            $db->removeSession($sessionId);
             break;
 
         case 'get_anime_list':
