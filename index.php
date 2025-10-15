@@ -601,8 +601,11 @@
                 <label for="sessionTasks">Select Tasks</label>
                 <div class="formField" style="display: flex; gap: 10%; flex-direction: row;">
                     <div style="width: 60%;">
-                        <input type="text" id="taskFilter" class="textFieldInput" placeholder="Search tasks..." oninput="SessionModal.searchTasks(this)">
-                        <table id="taskTable" class="table">
+						<div style="display:flex; gap: 5%">
+							<input type="text" id="taskFilter" class="textFieldInput" style="width: 70%" placeholder="Search tasks..." oninput="SessionModal.searchTasks(this)">
+							<button class="button" onclick="TaskModal.showAdd()">New Task</button>
+                        </div>
+						<table id="taskTable" class="table">
                             <tbody>
                             </tbody>
                         </table>
@@ -658,7 +661,7 @@
 </div>
 	   <script>
 			$(function() {
-				App.renderAll();
+				App.renderAllTables();
 				App.renderAnime();
 			});
 	   </script>

@@ -1,21 +1,15 @@
 let App = {
 
-    renderAll: function(onComplete) {
+    renderAllTables: function(onComplete) {
 
         this.renderTasks(null, () => {
             this.renderSessions(null, () => {
                 this.renderDueTasks(null, () => {
-                    App.updatePreviews();
                     if (onComplete) onComplete();
                 })
             })
         })
 
-    },
-
-    updatePreviews: function() {
-        TaskModal.updatePreview();
-        SessionModal.updatePreview();
     },
 
     // TASKS
@@ -83,12 +77,18 @@ let App = {
             return;
         }
 
-        Service.addEditTask(task, () => {
-            if (task.id == 0) {
-                this.renderAll();
-                TaskModal.close();
-            } else {
-                this.renderAll(() => App.updatePreviews());
+        Service.addEditTask(task, (addedTask) => {
+            if (task.id == 0) { // Add new task
+                this.renderAllTables(() => {
+                    TaskModal.close();
+                    SessionModal.searchTasks();
+                });
+
+            } else {    // Edit task
+                this.renderAllTables(() => {
+                    TaskModal.updatePreview();
+                    SessionModal.updatePreview();
+                });
             }
         })
     },
@@ -96,7 +96,10 @@ let App = {
     markTaskAsInProgress: function(taskOccurenceId, taskId) {
         Service.updateTaskOccurenceStatusToInProgress(
             taskOccurenceId,
-            () =>  this.renderAll()
+            () =>  this.renderAllTables(() => {
+                TaskModal.updatePreview();
+                SessionModal.updatePreview();
+            })
         );
     },
 
@@ -108,7 +111,7 @@ let App = {
                     alert(`Next review to be on ${formatDate(res.new_repeat_task_occurence_date)} as per the repeat policy.`);
                 }
 
-                this.renderAll(() => {
+                this.renderAllTables(() => {
                     TaskModal.updatePreview();
                     SessionModal.updatePreview();
                 })
@@ -119,7 +122,10 @@ let App = {
     markTaskAsPending: function(taskOccurenceId, taskId) {
         Service.updateTaskOccurenceStatusToPending(
             taskOccurenceId,
-            () =>  this.renderAll()
+            () =>  this.renderAllTables(() => {
+                TaskModal.updatePreview();
+                SessionModal.updatePreview();
+            })
         );
     },
 
@@ -132,7 +138,10 @@ let App = {
             taskId,
             reviewDate,
             repeatPolicy,
-            () => this.renderAll()
+            () => this.renderAllTables(() => {
+                TaskModal.updatePreview();
+                SessionModal.updatePreview();
+            })
         )
     },
 
@@ -219,21 +228,16 @@ let App = {
             return;
         }
 
-        Service.addEditSession(session, () => {
-            if (session.id == 0) {
-                this.renderAll();
-                SessionModal.close();
-            } else {
-                this.renderAll();
+        Service.addEditSession(session, (addedSession) => {
+            if (session.id == 0) { // New session
+                this.renderAllTables(() => SessionModal.showPreview(addedSession.id));
+
+            } else {    // Edit session 
+                this.renderAllTables(() => SessionModal.updatePreview());
+                
             }
         })
     },
-
-
-    editSession: function() {
-
-    },
-
 
     // DUE
     renderDueTasks: function(page, onComplete) {
@@ -265,10 +269,11 @@ let App = {
 let TaskModal = {
 
     showAdd: function() {
+        event.preventDefault();
         $('#taskIdHidden').val("0");
         $('#modalTitle').text('Add Task');
-        $('#taskReview').show();
-        $('#taskRepeatPolicy').show();
+        $('#taskReview').closest('.formField').show();
+        $('#taskRepeatPolicy').closest('.formField').show();
         $('#taskForm')[0].reset();
         $('#taskPreview').hide();
         $('#taskForm').show();
@@ -335,8 +340,8 @@ let TaskModal = {
         $('#taskTags').val(task.tags.join(","));
         $('#taskUrl').val(task.url);
         $('#taskDescription').val(task.description);
-        $('#taskReview').hide();
-        $('#taskRepeatPolicy').hide();
+        $('#taskReview').closest('.formField').hide();
+        $('#taskRepeatPolicy').closest('.formField').hide();
 
         $('#taskPreview').hide();
         $('#taskForm').show();
@@ -415,8 +420,9 @@ const SessionModal = {
         $('#sessionModal').show();
     },
 
-    updatePreview: function() {
+    updatePreview: function() {         
         if ($('#sessionModal').is(':visible')) {
+            // If preview session is open, then re-render preview
             this.showPreview($('#sessionPreview').attr('data-sessionid'));
         }
     },
@@ -426,7 +432,7 @@ const SessionModal = {
         let session = Service.getSession(sessionId);
 
         $('#sessionIdHidden').val(sessionId);
-        $('#sessionModalTitle').text('Edit Task');
+        $('#sessionModalTitle').text('Edit Session');
         $('#sessionName').val(session.name);
         $('#sessionDescription').val(session.description);
         $('#sessionDueDate').val(session.due_date.split(' ')[0]);
@@ -449,6 +455,10 @@ const SessionModal = {
     },
 
     searchTasks: function(tis) {
+        if (!$('#taskTable').is(':visible')) {
+            return;
+        }
+
         // Debounce logic
         clearTimeout(this._searchTaskTimeout);
         this._searchTaskTimeout = setTimeout(() => {
@@ -722,11 +732,9 @@ let Service = {
     },
 
     addEditTask: function(task, onSuccess) {
-        console.log(task);
-
         this._doAjax(
             {action: "add_task", task: task},
-            () => onSuccess(),
+            (addedTask) => onSuccess(addedTask),
             "POST",
         );
     },
@@ -792,7 +800,7 @@ let Service = {
     addEditSession: function(session, onSuccess) {
         this._doAjax(
             { action: 'add_session', session: session },
-            () => onSuccess(),
+            (res) => onSuccess(res),
             "POST"
         );
     },
