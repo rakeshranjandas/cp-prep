@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 15, 2025 at 01:50 AM
+-- Generation Time: Oct 15, 2025 at 02:24 PM
 -- Server version: 8.0.43-0ubuntu0.22.04.2
 -- PHP Version: 8.1.2-1ubuntu2.22
 
@@ -259,8 +259,8 @@ ALTER TABLE `sessions_task_occurences`
 -- Constraints for table `tasks_repeat`
 --
 ALTER TABLE `tasks_repeat`
-  ADD CONSTRAINT `tasks_repeat_ibfk_1` FOREIGN KEY (`tasks_id`) REFERENCES `tasks` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `tasks_repeat_ibfk_2` FOREIGN KEY (`last_task_occurences_id`) REFERENCES `task_occurences` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `tasks_repeat_ibfk_1` FOREIGN KEY (`tasks_id`) REFERENCES `tasks` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  ADD CONSTRAINT `tasks_repeat_ibfk_2` FOREIGN KEY (`last_task_occurences_id`) REFERENCES `task_occurences` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 --
 -- Constraints for table `tasks_tags`
