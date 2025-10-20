@@ -49,8 +49,8 @@
 		}
 		.sessions {
 			grid-column: 3; /* Right column */
-			position: sticky;
-			top: 0;
+			/* position: sticky; */
+			/* top: 0; */
 		}
 		.header {
 			display: flex;
@@ -469,6 +469,7 @@
 	<div id="taskModal" class="modal modal-1" style="display: none;">
 		<div class="modal-content">
 			<h2 id="modalTitle"></h2>
+			<input type="hidden" id="taskIdHidden" name="taskId" value="0">
 			<div id="taskPreview" style="display:block;" data-taskid="">
 				<p><strong>Tags:</strong> <span id="previewTags"></span></p>
 				<p><strong>URL:</strong> <span id="previewUrl"></span></p>
@@ -500,7 +501,6 @@
 				</div>
 			</div>
 			<form id="taskForm" style="display:none;">
-				<input type="hidden" id="taskIdHidden" name="taskId" value="0">
 				<div class="formField">
 					<label for="taskTitle">Title</label>
 					<input type="text" id="taskTitle" name="taskTitle" class="textFieldInput">
@@ -549,6 +549,7 @@
 	<div id="sessionModal" class="modal" style="display: none;">
     <div class="modal-content">
         <h2 id="sessionModalTitle"></h2>
+		<input type="hidden" id="sessionIdHidden" name="sessionId" value="0">
         <div id="sessionPreview" style="display:block;" data-sessionid="">
             <p><strong>Status:</strong> <span id="previewSessionStatus"></span></p>
 			<p><strong>Due Date:</strong> <span id="previewSessionDueDate"></span></p>
@@ -586,7 +587,6 @@
             </div>
         </div>
         <form id="sessionForm" style="display:none;">
-            <input type="hidden" id="sessionIdHidden" name="sessionId" value="0">
             <div class="formField">
                 <label for="sessionName">Name</label>
                 <input type="text" id="sessionName" name="sessionName" class="textFieldInput">

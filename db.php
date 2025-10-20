@@ -136,7 +136,7 @@ class DB {
 
         $lastOccurence = $this->getLastTaskOccurenceOfTask($taskId);
         $task['next_review_date'] = $lastOccurence ? date("Y-m-d", strtotime($lastOccurence['due_date'])) : "";
-        $task['status'] = $lastOccurence ? $lastOccurence['status'] : "";
+        $task['status'] = $lastOccurence ? $lastOccurence['status'] : self::STATUS_TASK_COMPLETED;
         $task["repeats"] = $this->getRepeatsForTask($taskId);
 
         $stmt->close();

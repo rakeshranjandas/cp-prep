@@ -100,9 +100,10 @@ let App = {
         if (!okok) return;
 
         Service.removeTask(taskId, () => {
-            this.renderAllTables();
-            TaskModal.close();
-            SessionModal.updatePreview();
+            this.renderAllTables(() => {
+                TaskModal.close();
+                SessionModal.updatePreview();
+            });
         });
     },
 
@@ -143,7 +144,7 @@ let App = {
     },
 
     addNewTaskReviewFromPreview: function() {
-        let taskId =  $('#taskPreview').attr("data-taskid");
+        let taskId = $('#taskIdHidden').val();
         let reviewDate = $('#addNewReviewDateFromPreview').val();
         let repeatPolicy = $('#addNewRepeatPolicyFromPreview').val().trim();
 
@@ -308,6 +309,7 @@ let TaskModal = {
     showPreview: function(taskId) {
         let task = Service.getTask(taskId);
 
+        $('#taskIdHidden').val(taskId);
         $('#modalTitle').text(task.title);
         $('#previewStatus').text(task.status);
         $('#previewPlatform').text(task.platform);
@@ -341,8 +343,6 @@ let TaskModal = {
         // Set the repeat policy field blank
         $('#addNewRepeatPolicyFromPreview').val("");
 
-
-        $('#taskPreview').attr("data-taskid", taskId);
         $('#taskPreview').show();
         $('#taskForm').hide();
         $('#taskModal').fadeIn();
@@ -350,15 +350,14 @@ let TaskModal = {
 
     updatePreview: function() {
         if ($('#taskModal').is(':visible')) {
-            this.showPreview($('#taskPreview').attr('data-taskid'));
+            this.showPreview($('#taskIdHidden').val());
         }
     },
 
     showEdit: function() {
-        let taskId =  $('#taskPreview').attr("data-taskid");
+        let taskId = $('#taskIdHidden').val();
         let task = Service.getTask(taskId);
 
-        $('#taskIdHidden').val(taskId);
         $('#modalTitle').text('Edit Task');
         $('#taskTitle').val(task.title);
         $('#taskPlatform').val(task.platform);
@@ -375,7 +374,7 @@ let TaskModal = {
 
     remove: function() {
         event.preventDefault();
-        let taskId =  $('#taskPreview').attr("data-taskid");
+        let taskId = $('#taskIdHidden').val();
         App.removeTask(taskId);
     },
 
@@ -412,6 +411,7 @@ const SessionModal = {
     _selectedTasks: [],
 
     showAdd: function() {
+        $('#sessionIdHidden').val('0');
         $('#sessionModalTitle').text('New Session');
         $('#sessionPreview').hide();
         $('#sessionForm').show();
@@ -424,6 +424,7 @@ const SessionModal = {
     showPreview: function(sessionId) {
         let session = Service.getSession(sessionId);
 
+        $('#sessionIdHidden').val(sessionId);
         $('#sessionModalTitle').text(session.name);
         $('#previewSessionStatus').html(`<span class="status ${session.status.toLowerCase().replace(' ', '')}">${session.status.toLowerCase()}</span>`);
         $('#previewSessionDueDate').text(formatDate(session.due_date));
@@ -445,7 +446,6 @@ const SessionModal = {
             }, "")
         );
 
-        $('#sessionPreview').attr("data-sessionid", sessionId);
         $('#sessionPreview').show();
         $('#sessionForm').hide();
         $('#sessionModal').fadeIn();
@@ -454,15 +454,14 @@ const SessionModal = {
     updatePreview: function() {         
         if ($('#sessionModal').is(':visible')) {
             // If preview session is open, then re-render preview
-            this.showPreview($('#sessionPreview').attr('data-sessionid'));
+            this.showPreview($('#sessionIdHidden').val());
         }
     },
 
     showEdit: function() {
-        let sessionId =  $('#sessionPreview').attr("data-sessionId");
+        let sessionId = $('#sessionIdHidden').val();
         let session = Service.getSession(sessionId);
 
-        $('#sessionIdHidden').val(sessionId);
         $('#sessionModalTitle').text('Edit Session');
         $('#sessionName').val(session.name);
         $('#sessionDescription').val(session.description);
@@ -484,7 +483,7 @@ const SessionModal = {
 
     remove: function() {
         event.preventDefault();
-        let sessionId =  $('#sessionPreview').attr("data-sessionId");
+        let sessionId = $('#sessionIdHidden').val();
         App.removeSession(sessionId);
     },
 
