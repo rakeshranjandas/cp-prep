@@ -313,7 +313,7 @@ let TaskModal = {
         $('#modalTitle').text(task.title);
         $('#previewStatus').text(task.status);
         $('#previewPlatform').text(task.platform);
-        $('#previewUrl').text(task.url);
+        $('#previewUrl').html(`<a style="text-decoration:none" href="${task.url}" target="_blank">➚</a>&nbsp;` + task.url);
         $('#previewTags').html(task.tags.reduce((prev, cur) => prev + `<span class="tag">${cur}</span>`, ""));
         $('#previewDescription').text(task.description);
         $('#previewReviewTable>tbody').html(
@@ -435,7 +435,7 @@ const SessionModal = {
                 return prev +
                     `<tr>
                         <td>
-							<a style="text-decoration:none" href="${cur.url}" target="_blank">🔗</a>
+							<a style="text-decoration:none" href="${cur.url}" target="_blank">➚</a>
 						</td>
 						<td>
 							<span style="cursor:pointer" onclick="TaskModal.showPreview(${cur.tasks_id})">${cur.title}</span>
