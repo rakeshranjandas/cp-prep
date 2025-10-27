@@ -153,6 +153,10 @@
 			margin-left: 10px;
 		}
 
+		#previewDescription, #previewSessionDescription {
+			margin-left: 20px;
+		}
+
 		#previewReviewTable {
 			margin-top: 40px;
 			margin-bottom: 50px;
@@ -474,7 +478,7 @@
 				<p><strong>Tags:</strong> <span id="previewTags"></span></p>
 				<p><strong>URL:</strong> <span id="previewUrl"></span></p>
 				<p><strong>Platform:</strong> <span id="previewPlatform"></span></p>
-				<p><strong>Description:</strong> <span id="previewDescription"></span></p>
+				<p><strong>Description:</strong> <pre id="previewDescription" disabled></pre></p>
 				<!-- <p><strong>Active Repeats:</strong> <ul id="previewRepeatPolicy"></ul></p> -->
 				<p id="reviewTaskAgainInPreview" style="display:none">
 					<strong>Add New Review:</strong>
@@ -553,7 +557,7 @@
         <div id="sessionPreview" style="display:block;" data-sessionid="">
             <p><strong>Status:</strong> <span id="previewSessionStatus"></span></p>
 			<p><strong>Due Date:</strong> <span id="previewSessionDueDate"></span></p>
-            <p><strong>Description:</strong> <span id="previewSessionDescription"></span></p>
+            <p><strong>Description:</strong> <pre id="previewSessionDescription"></pre></p>
             <table id="sessionTasksReviewTable" class="table">
                 <thead>
                     <tr>
