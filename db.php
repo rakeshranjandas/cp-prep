@@ -266,6 +266,7 @@ class DB {
             FROM tags
             JOIN tasks_tags ON tags.id = tasks_tags.tags_id
             WHERE tasks_tags.tasks_id = ?
+            ORDER BY tags.name
         ");
 
         $stmt->bind_param("i", $taskId);
